@@ -1,7 +1,0 @@
-{
-  "/(app)/check-in/page": "app/(app)/check-in/page.js",
-  "/(app)/confidence/page": "app/(app)/confidence/page.js",
-  "/(app)/journal/page": "app/(app)/journal/page.js",
-  "/(app)/learn/page": "app/(app)/learn/page.js",
-  "/(app)/page": "app/(app)/page.js"
-}
