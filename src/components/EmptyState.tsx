@@ -1,19 +1,25 @@
 "use client";
 
+import { type ReactNode } from "react";
+
 interface EmptyStateProps {
-  icon: string;
+  icon: ReactNode;
   title: string;
   description: string;
 }
 
 export function EmptyState({ icon, title, description }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 text-center animate-fade-up">
-      <span className="text-4xl mb-3">{icon}</span>
-      <h2 className="font-display text-lg font-semibold text-sand-800">
+    <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-up">
+      <div className="icon-container icon-xl icon-warm rounded-[20px] mb-6">
+        {icon}
+      </div>
+      <h2 className="text-heading text-[22px] text-[var(--text-primary)]">
         {title}
       </h2>
-      <p className="mt-1 text-sm text-sand-500 max-w-xs">{description}</p>
+      <p className="mt-2 text-[15px] text-[var(--text-secondary)] max-w-sm leading-relaxed">
+        {description}
+      </p>
     </div>
   );
 }
