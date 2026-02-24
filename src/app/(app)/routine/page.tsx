@@ -19,6 +19,7 @@ import {
   CalloutPanel,
   SectionLabel,
 } from "@/components/ui";
+import { RecommendedRoutine } from "@/features/routine/RecommendedRoutine";
 
 const TODAY = new Date().toISOString().split("T")[0];
 
@@ -78,6 +79,9 @@ export default function RoutinePage() {
           {/* ============ ROUTINES TAB ============ */}
           {view === "routines" && (
             <div className="space-y-4 animate-fade-up stagger-2">
+              {/* Personalized recommendation */}
+              <RecommendedRoutine />
+
               {/* Existing routines */}
               {routines.map((routine) => (
                 <RoutineCard
