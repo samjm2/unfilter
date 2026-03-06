@@ -51,11 +51,100 @@
   --radius-md: 16px;
   --radius-lg: 24px;
   --radius-xl: 32px;
+  --text-scale: 1;
 }
 
 html {
   scroll-behavior: smooth;
-  font-size: 16px;
+  font-size: calc(16px * var(--text-scale));
+}
+
+html[data-text-size="small"] {
+  --text-scale: 0.92;
+}
+
+html[data-text-size="medium"] {
+  --text-scale: 1;
+}
+
+html[data-text-size="large"] {
+  --text-scale: 1.1;
+}
+
+html[data-theme="dark"] {
+  --bg-primary: #17171b;
+  --bg-secondary: #1f2026;
+  --bg-card: #22242c;
+  --bg-card-hover: #2a2d36;
+  --bg-elevated: #272a33;
+
+  --accent: #86b896;
+  --accent-light: #2b3d32;
+  --accent-lighter: #32473b;
+  --accent-dark: #b1dbbe;
+  --accent-glow: rgba(134, 184, 150, 0.16);
+
+  --warm-100: #17171b;
+  --warm-200: #1f2026;
+  --warm-300: #2c2f37;
+  --warm-400: #3e434e;
+  --warm-500: #545b69;
+  --warm-600: #737d8f;
+  --warm-700: #9ca6b8;
+  --warm-800: #c4cede;
+  --warm-900: #e8eef9;
+
+  --text-primary: #eff3fb;
+  --text-secondary: #c4cede;
+  --text-tertiary: #9ca6b8;
+  --text-muted: #7e899d;
+
+  --border: #3c414c;
+  --border-light: #323743;
+  --border-hover: #4d5563;
+
+  --coral: #f18a72;
+  --coral-light: #3f2824;
+  --amber: #e6bc6a;
+  --amber-light: #3a3221;
+}
+
+html[data-contrast="high"] {
+  --accent: #1f5f31;
+  --accent-light: #d7f2df;
+  --accent-lighter: #eefaf1;
+  --accent-dark: #0f381c;
+
+  --text-primary: #111111;
+  --text-secondary: #222222;
+  --text-tertiary: #333333;
+  --text-muted: #4a4a4a;
+
+  --border: #545454;
+  --border-light: #6a6a6a;
+  --border-hover: #444444;
+}
+
+html[data-theme="dark"][data-contrast="high"] {
+  --bg-primary: #060607;
+  --bg-secondary: #0f1114;
+  --bg-card: #15171c;
+  --bg-card-hover: #1d2027;
+  --bg-elevated: #171b21;
+
+  --accent: #97ffb7;
+  --accent-light: #173123;
+  --accent-lighter: #244836;
+  --accent-dark: #cbffdc;
+
+  --text-primary: #ffffff;
+  --text-secondary: #f0f6ff;
+  --text-tertiary: #d2dbe8;
+  --text-muted: #b3bfce;
+
+  --border: #8d97a9;
+  --border-light: #798397;
+  --border-hover: #a0acc2;
 }
 
 ::selection {
@@ -82,6 +171,13 @@ body::before {
     radial-gradient(ellipse 80% 60% at 10% 20%, rgba(74, 124, 89, 0.06), transparent),
     radial-gradient(ellipse 60% 80% at 90% 80%, rgba(196, 140, 42, 0.04), transparent),
     radial-gradient(ellipse 50% 50% at 50% 50%, rgba(196, 82, 58, 0.02), transparent);
+}
+
+html[data-theme="dark"] body::before {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 20%, rgba(134, 184, 150, 0.12), transparent),
+    radial-gradient(ellipse 60% 80% at 90% 80%, rgba(230, 188, 106, 0.08), transparent),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(241, 138, 114, 0.06), transparent);
 }
 
 /* Subtle grain */

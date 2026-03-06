@@ -1,5 +1,6 @@
 "use client";
 
+import type { ComponentType } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store";
@@ -7,27 +8,27 @@ import {
   IconHome,
   IconCamera,
   IconJournal,
-  IconDroplet,
+  IconShield,
   IconBook,
   IconSparkle,
-  IconUsers,
   IconHelp,
   IconSettings,
-  IconShield,
 } from "@/components/icons";
 
-const NAV_ITEMS = [
-  { href: "/", label: "Home", icon: IconHome },
-  { href: "/check-in", label: "Check-in", icon: IconCamera },
+const CORE_ITEMS = [
+  { href: "/lab", label: "Distortion Lab", icon: IconCamera },
+  { href: "/routine", label: "Barrier Safety", icon: IconShield },
   { href: "/journal", label: "Journal", icon: IconJournal },
-  { href: "/routine", label: "Routine", icon: IconDroplet },
-  { href: "/learn", label: "Learn", icon: IconBook },
-  { href: "/confidence", label: "Confidence", icon: IconSparkle },
-  { href: "/community", label: "Trusted Circle", icon: IconUsers },
 ];
 
-const BOTTOM_ITEMS = [
-  { href: "/help", label: "Help", icon: IconHelp },
+const SUPPORT_ITEMS = [
+  { href: "/check-in", label: "On-Device Insight", icon: IconSparkle },
+  { href: "/learn", label: "Learn Hub", icon: IconBook },
+  { href: "/help", label: "Skin Literacy Guide", icon: IconHelp },
+];
+
+const INFRA_ITEMS = [
+  { href: "/", label: "Home", icon: IconHome },
   { href: "/settings", label: "Settings", icon: IconSettings },
 ];
 
@@ -42,7 +43,7 @@ export function SideNav() {
   };
 
   return (
-    <aside className="hidden md:flex flex-col w-[260px] shrink-0 border-r border-[var(--border-light)] bg-white/50 backdrop-blur-sm h-screen sticky top-0">
+    <aside className="hidden md:flex flex-col w-[260px] shrink-0 border-r border-[var(--border-light)] bg-[var(--bg-elevated)]/80 backdrop-blur-sm h-screen sticky top-0">
       {/* Logo */}
       <div className="px-6 pt-7 pb-6">
         <Link href="/" className="flex items-center gap-3">
@@ -61,50 +62,13 @@ export function SideNav() {
 
       {/* Main nav */}
       <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map((item) => {
-          const active = pathname === item.href;
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3.5 rounded-[12px] px-4 py-3 text-[15px] font-medium transition-all ${
-                active
-                  ? "bg-[var(--accent-light)] text-[var(--accent-dark)]"
-                  : "text-[var(--text-secondary)] hover:bg-[var(--warm-200)] hover:text-[var(--text-primary)]"
-              }`}
-            >
-              <Icon size={20} className={active ? "text-[var(--accent)]" : ""} />
-              <span>{item.label}</span>
-              {active && (
-                <div className="ml-auto h-2 w-2 rounded-full bg-[var(--accent)]" />
-              )}
-            </Link>
-          );
-        })}
+        <NavSection label="Core Systems" items={CORE_ITEMS} pathname={pathname} />
+        <NavSection label="Supporting Systems" items={SUPPORT_ITEMS} pathname={pathname} />
+        <NavSection label="Infrastructure" items={INFRA_ITEMS} pathname={pathname} />
       </nav>
 
       {/* Bottom section */}
       <div className="border-t border-[var(--border-light)] px-4 py-4 space-y-1">
-        {BOTTOM_ITEMS.map((item) => {
-          const active = pathname === item.href;
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3.5 rounded-[12px] px-4 py-2.5 text-[14px] font-medium transition-all ${
-                active
-                  ? "bg-[var(--accent-light)] text-[var(--accent-dark)]"
-                  : "text-[var(--text-tertiary)] hover:bg-[var(--warm-200)] hover:text-[var(--text-secondary)]"
-              }`}
-            >
-              <Icon size={18} />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-
         {/* User + logout */}
         {user && (
           <div className="mt-3 mx-1 rounded-[14px] bg-[var(--warm-200)] px-4 py-3">
@@ -136,12 +100,57 @@ export function SideNav() {
                 100% On-Device
               </p>
               <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">
-                Your data never leaves your phone
+                Photos never leave your device
               </p>
             </div>
           </div>
         </div>
       </div>
     </aside>
+  );
+}
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: ComponentType<{ size?: number; className?: string }>;
+};
+
+function NavSection({
+  label,
+  items,
+  pathname,
+}: {
+  label: string;
+  items: NavItem[];
+  pathname: string;
+}) {
+  return (
+    <div className="mb-3">
+      <p className="px-4 pt-2 pb-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--text-muted)]">
+        {label}
+      </p>
+      {items.map((item) => {
+        const active = pathname === item.href;
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`flex items-center gap-3.5 rounded-[12px] px-4 py-3 text-[15px] font-medium transition-all ${
+              active
+                ? "bg-[var(--accent-light)] text-[var(--accent-dark)]"
+                : "text-[var(--text-secondary)] hover:bg-[var(--warm-200)] hover:text-[var(--text-primary)]"
+            }`}
+          >
+            <Icon size={20} className={active ? "text-[var(--accent)]" : ""} />
+            <span>{item.label}</span>
+            {active && (
+              <div className="ml-auto h-2 w-2 rounded-full bg-[var(--accent)]" />
+            )}
+          </Link>
+        );
+      })}
+    </div>
   );
 }

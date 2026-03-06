@@ -20,15 +20,26 @@ export default function HelpPage() {
           {/* Header */}
           <div className="mb-6 animate-fade-up">
             <h1 className="text-display text-[clamp(24px,3.5vw,36px)] text-[var(--text-primary)]">
-              Help &amp; Resources
+              Teen Skin Literacy Guide
             </h1>
             <p className="mt-1 text-[15px] text-[var(--text-secondary)]">
-              Know when to get help, how to talk about it, and where to go.
+              Educational support only: filter distortion, ingredient interactions, routine simplification, and when to escalate care.
             </p>
           </div>
 
-          {/* Urgent banner */}
           <div className="mb-6 animate-fade-up stagger-1">
+            <div className="card rounded-[var(--radius-md)] p-4">
+              <p className="text-[13px] font-semibold text-[var(--text-primary)] mb-2">
+                Scope of this guide
+              </p>
+              <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">
+                It can explain filter distortion, ingredient interactions, and simpler routines, and help identify when professional care may be needed. It does not diagnose skin conditions.
+              </p>
+            </div>
+          </div>
+
+          {/* Urgent banner */}
+          <div className="mb-6 animate-fade-up stagger-2">
             <CalloutPanel icon="🚨" variant="coral">
               <strong>If you feel very unwell right now</strong> — high fever,
               rapidly spreading rash, difficulty breathing, or severe swelling —

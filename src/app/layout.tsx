@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import { AuthGate } from "@/components/AuthGate";
+import { SettingsInitializer } from "@/components/SettingsInitializer";
 
 export const metadata = {
   title: "Unfilter",
@@ -12,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" data-text-size="medium" data-theme="light" data-contrast="normal">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -26,6 +27,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <SettingsInitializer />
         <AuthGate>{children}</AuthGate>
       </body>
     </html>
