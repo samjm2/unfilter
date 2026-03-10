@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat \"/Users/jotin/Downloads/unfilter-main/src/app/\\(app\\)/lab/page.tsx\")"
+    ]
+  }
+}
