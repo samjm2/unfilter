@@ -10,7 +10,7 @@ import { useAuthStore } from "@/features/auth/store";
     Everything else requires a valid session.
     ================================================================ */
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/login", "/signup", "/landing"];
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
   const { user, initialized, loading, initialize } = useAuthStore();

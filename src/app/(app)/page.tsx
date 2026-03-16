@@ -3,128 +3,78 @@
 import Link from "next/link";
 import { AppShell } from "@/components/AppShell";
 import { OnboardingGate } from "@/components/OnboardingGate";
-import { DistortionDemo } from "@/components/DistortionDemo";
 import {
   IconCamera,
   IconJournal,
   IconShield,
   IconSparkle,
   IconBook,
-  IconSettings,
 } from "@/components/icons";
+import { useAuthStore } from "@/features/auth/store";
 
 export default function HomePage() {
+  const { user } = useAuthStore();
+  const firstName = user?.username?.split(" ")[0] ?? "there";
+
   return (
     <OnboardingGate>
       <AppShell>
-        <div className="mx-auto max-w-3xl">
-          {/* Editorial hero */}
-          <section className="mb-12 animate-fade-up">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="h-px flex-1 bg-gradient-to-r from-[var(--border)] to-transparent" />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)]">
-                Skin Literacy Platform
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-l from-[var(--border)] to-transparent" />
-            </div>
-            <h1 className="text-display text-[clamp(36px,7vw,60px)] text-[var(--text-primary)] text-center">
-              See Skin Clearly.
-            </h1>
-            <p className="mt-5 mx-auto max-w-lg text-center text-[16px] leading-[1.7] text-[var(--text-tertiary)]">
-              Filters hide what real skin looks like. Unfilter shows you the
-              difference&mdash;and protects you from skincare trends that do
-              more harm than good.
+        <div className="mx-auto max-w-2xl">
+          {/* Privacy banner — top of page */}
+          <div className="mb-8 flex items-center gap-3 rounded-[12px] border border-[var(--accent-light)] bg-[var(--accent-lighter)] px-4 py-3 animate-fade-up">
+            <IconShield size={16} className="text-[var(--accent)] shrink-0" />
+            <p className="text-[12px] font-medium text-[var(--accent-dark)]">
+              100% on-device processing. Photos never leave this device.
             </p>
+          </div>
+
+          {/* Warm welcome — not a wall of text */}
+          <section className="mb-10 animate-fade-up stagger-1">
+            <p className="text-[13px] font-medium text-[var(--accent)] mb-2">
+              Welcome back, {firstName}
+            </p>
+            <h1 className="text-display text-[clamp(28px,5vw,42px)] text-[var(--text-primary)] leading-tight">
+              What would you like<br />to explore today?
+            </h1>
           </section>
 
-          {/* Distortion Demo — the 60-second hook */}
-          <section className="mb-14 animate-fade-up stagger-1">
-            <DistortionDemo />
+          {/* Core actions — clean, spaced, inviting */}
+          <section className="mb-10 space-y-3 animate-fade-up stagger-2">
+            <ActionCard
+              href="/lab"
+              icon={<IconCamera size={22} />}
+              iconBg="bg-[var(--accent-light)] text-[var(--accent)]"
+              title="Distortion Lab"
+              desc="See how filters really change your photos"
+            />
+            <ActionCard
+              href="/routine"
+              icon={<IconShield size={22} />}
+              iconBg="bg-[var(--coral-light)] text-[var(--coral)]"
+              title="Barrier Safety Copilot"
+              desc="Check your routine for ingredient conflicts"
+            />
+            <ActionCard
+              href="/journal"
+              icon={<IconJournal size={22} />}
+              iconBg="bg-[var(--gold-light)] text-[var(--gold)]"
+              title="Skin Journal"
+              desc="Track your skin and confidence over time"
+            />
           </section>
 
           {/* Divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent mb-14" />
+          <div className="h-px bg-gradient-to-r from-transparent via-[var(--border)] to-transparent mb-8" />
 
-          {/* Three pillars — editorial row */}
-          <section className="mb-14 animate-fade-up stagger-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)] mb-6">
-              Core Tools
+          {/* Secondary links — quiet, not competing */}
+          <section className="mb-6 animate-fade-up stagger-3">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)] mb-3 px-1">
+              More
             </p>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <PillarCard
-                href="/lab"
-                icon={<IconCamera size={20} />}
-                title="Distortion Lab"
-                desc="See how smoothing, lighting, and contrast distort real skin."
-                accent="sage"
-              />
-              <PillarCard
-                href="/routine"
-                icon={<IconShield size={20} />}
-                title="Barrier Safety"
-                desc="Warns about ingredient overuse, conflicts, and risky stacking."
-                accent="coral"
-              />
-              <PillarCard
-                href="/journal"
-                icon={<IconJournal size={20} />}
-                title="Skin Journal"
-                desc="Track confidence, routine changes, and skin over time."
-                accent="gold"
-              />
-            </div>
-          </section>
-
-          {/* Privacy — inline editorial callout */}
-          <section className="mb-14 animate-fade-up stagger-3">
-            <div className="rounded-[var(--radius-lg)] bg-[var(--accent-lighter)] border border-[var(--accent-light)] px-6 py-5">
-              <div className="flex items-start gap-4">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent-light)]">
-                  <IconShield size={16} className="text-[var(--accent)]" />
-                </div>
-                <div>
-                  <p className="text-[14px] font-semibold text-[var(--accent-dark)]">
-                    100% On-Device Processing
-                  </p>
-                  <p className="mt-1 text-[13px] leading-relaxed text-[var(--text-tertiary)]">
-                    Photos never leave your device. No cloud uploads. Auto-delete
-                    enabled by default. Your skin data stays yours.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Supporting tools — quieter, editorial list */}
-          <section className="mb-14 animate-fade-up stagger-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--text-muted)] mb-5">
-              Learn &amp; Support
-            </p>
-            <div className="space-y-1">
-              <EditorialLink
-                href="/check-in"
-                icon={<IconSparkle size={16} />}
-                title="On-Device Skin Insight"
-                desc="Private capture and observation"
-              />
-              <EditorialLink
-                href="/learn"
-                icon={<IconBook size={16} />}
-                title="Learn Hub"
-                desc="Myth-busting and practical skin literacy"
-              />
-              <EditorialLink
-                href="/help"
-                icon={<IconSparkle size={16} />}
-                title="Help & Escalation"
-                desc="Red flags, conversation scripts, and resources"
-              />
-              <EditorialLink
-                href="/settings"
-                icon={<IconSettings size={16} />}
-                title="Settings"
-                desc="Accessibility, privacy controls, and account"
-              />
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <QuickLink href="/check-in" icon={<IconSparkle size={15} />} label="Check-In" />
+              <QuickLink href="/learn" icon={<IconBook size={15} />} label="Learn Hub" />
+              <QuickLink href="/confidence" icon={<IconSparkle size={15} />} label="Confidence" />
             </div>
           </section>
         </div>
@@ -133,73 +83,58 @@ export default function HomePage() {
   );
 }
 
-function PillarCard({
+/* --- Action Card --- */
+
+function ActionCard({
   href,
   icon,
+  iconBg,
   title,
   desc,
-  accent,
 }: {
   href: string;
   icon: React.ReactNode;
+  iconBg: string;
   title: string;
   desc: string;
-  accent: "sage" | "coral" | "gold";
 }) {
-  const iconBg = {
-    sage: "bg-[var(--accent-light)] text-[var(--accent)]",
-    coral: "bg-[var(--coral-light)] text-[var(--coral)]",
-    gold: "bg-[var(--gold-light)] text-[var(--gold)]",
-  }[accent];
-
   return (
     <Link
       href={href}
-      className="card-interactive block rounded-[var(--radius-md)] p-5"
+      className="group flex items-center gap-4 rounded-[14px] border border-[var(--border-light)] bg-[var(--bg-card)] px-5 py-4 transition-all hover:border-[var(--border-hover)] hover:shadow-sm"
     >
-      <div
-        className={`mb-4 inline-flex h-10 w-10 items-center justify-center rounded-[10px] ${iconBg}`}
-      >
+      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] ${iconBg}`}>
         {icon}
       </div>
-      <h3 className="text-[15px] font-semibold text-[var(--text-primary)] leading-snug">
-        {title}
-      </h3>
-      <p className="mt-2 text-[13px] leading-relaxed text-[var(--text-tertiary)]">
-        {desc}
-      </p>
+      <div className="min-w-0 flex-1">
+        <p className="text-[15px] font-semibold text-[var(--text-primary)]">{title}</p>
+        <p className="text-[13px] text-[var(--text-tertiary)] mt-0.5">{desc}</p>
+      </div>
+      <span className="text-[var(--text-muted)] group-hover:text-[var(--text-tertiary)] transition text-[14px] shrink-0">
+        &rarr;
+      </span>
     </Link>
   );
 }
 
-function EditorialLink({
+/* --- Quick Link --- */
+
+function QuickLink({
   href,
   icon,
-  title,
-  desc,
+  label,
 }: {
   href: string;
   icon: React.ReactNode;
-  title: string;
-  desc: string;
+  label: string;
 }) {
   return (
     <Link
       href={href}
-      className="group flex items-center gap-4 rounded-[var(--radius-sm)] px-4 py-3.5 transition-colors hover:bg-[var(--bg-secondary)]"
+      className="flex items-center gap-2.5 rounded-[10px] bg-[var(--bg-secondary)] px-3.5 py-3 text-[12px] font-medium text-[var(--text-secondary)] hover:bg-[var(--warm-300)] transition"
     >
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] bg-[var(--warm-200)] text-[var(--text-tertiary)] group-hover:text-[var(--text-secondary)] transition-colors">
-        {icon}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[14px] font-semibold text-[var(--text-primary)]">
-          {title}
-        </p>
-        <p className="text-[12px] text-[var(--text-muted)]">{desc}</p>
-      </div>
-      <span className="text-[var(--text-muted)] group-hover:text-[var(--text-tertiary)] transition-colors text-[13px]">
-        &rarr;
-      </span>
+      <span className="text-[var(--text-muted)]">{icon}</span>
+      {label}
     </Link>
   );
 }

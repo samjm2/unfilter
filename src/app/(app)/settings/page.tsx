@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
+import { useAuthStore } from "@/features/auth/store";
 import {
   type AccessibilityPreferences,
   type TextSize,
@@ -46,7 +48,10 @@ function useAccessibilityPreferences() {
 
 export default function SettingsPage() {
   const { preferences, updatePreferences } = useAccessibilityPreferences();
+  const { logout } = useAuthStore();
+  const router = useRouter();
   const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(true);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const contrastEnabled = preferences.contrast === "high";
   const textSizeLabel = useMemo(
@@ -63,6 +68,21 @@ export default function SettingsPage() {
     }
     setAutoDeleteEnabled(raw === "true");
   }, []);
+
+  const handleLogout = useCallback(async (saveData: boolean) => {
+    if (!saveData) {
+      // Clear all unfilter local data before logging out
+      for (let i = window.localStorage.length - 1; i >= 0; i -= 1) {
+        const key = window.localStorage.key(i);
+        if (!key || !key.startsWith("unfilter-")) continue;
+        // Keep preferences (accessibility settings) — clear everything else
+        if (key === "unfilter-preferences") continue;
+        window.localStorage.removeItem(key);
+      }
+    }
+    await logout();
+    router.replace("/login");
+  }, [logout, router]);
 
   const toggleAutoDelete = () => {
     setAutoDeleteEnabled((current) => {
@@ -199,13 +219,13 @@ export default function SettingsPage() {
               role="switch"
               aria-checked={contrastEnabled}
               onClick={() => updatePreferences({ contrast: contrastEnabled ? "normal" : "high" })}
-              className={`relative h-8 w-14 rounded-full transition ${
+              className={`relative shrink-0 h-8 w-14 rounded-full transition ${
                 contrastEnabled ? "bg-[var(--accent)]" : "bg-[var(--warm-400)]"
               }`}
             >
               <span
-                className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
-                  contrastEnabled ? "translate-x-7" : "translate-x-1"
+                className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                  contrastEnabled ? "translate-x-6" : "translate-x-0"
                 }`}
               />
             </button>
@@ -239,13 +259,13 @@ export default function SettingsPage() {
               role="switch"
               aria-checked={autoDeleteEnabled}
               onClick={toggleAutoDelete}
-              className={`relative h-8 w-14 rounded-full transition ${
+              className={`relative shrink-0 h-8 w-14 rounded-full transition ${
                 autoDeleteEnabled ? "bg-[var(--accent)]" : "bg-[var(--warm-400)]"
               }`}
             >
               <span
-                className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
-                  autoDeleteEnabled ? "translate-x-7" : "translate-x-1"
+                className={`absolute top-1 left-1 h-6 w-6 rounded-full bg-white shadow transition-transform ${
+                  autoDeleteEnabled ? "translate-x-6" : "translate-x-0"
                 }`}
               />
             </button>
@@ -267,6 +287,59 @@ export default function SettingsPage() {
               Delete My Data
             </button>
           </div>
+        </section>
+
+        {/* Session & Account */}
+        <section className="card-elevated p-6 md:p-7 mt-5">
+          <div className="mb-4">
+            <p className="text-title text-[19px] text-[var(--text-primary)]">Session</p>
+            <p className="text-[14px] text-[var(--text-tertiary)]">
+              For shared devices, sign out when you&apos;re done to protect your data.
+            </p>
+          </div>
+
+          {!showLogoutConfirm ? (
+            <button
+              type="button"
+              onClick={() => setShowLogoutConfirm(true)}
+              className="rounded-[10px] border border-[var(--border)] px-4 py-2.5 text-[13px] font-semibold text-[var(--text-primary)] hover:bg-[var(--warm-200)] transition w-full text-left"
+            >
+              Sign Out
+            </button>
+          ) : (
+            <div className="rounded-[14px] bg-[var(--bg-secondary)] p-4 animate-fade-up">
+              <p className="text-[14px] font-semibold text-[var(--text-primary)] mb-1">
+                Save your progress?
+              </p>
+              <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
+                Your journal entries, routine data, and check-in history are stored on this device.
+                Choose whether to keep them for next time or clear everything.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleLogout(true)}
+                  className="rounded-[10px] bg-[var(--accent)] px-4 py-2 text-[13px] font-semibold text-white hover:bg-[var(--accent-dark)] transition"
+                >
+                  Save &amp; Sign Out
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleLogout(false)}
+                  className="rounded-[10px] border border-[var(--coral)]/30 bg-[var(--coral)]/10 px-4 py-2 text-[13px] font-semibold text-[var(--coral)] hover:bg-[var(--coral)]/20 transition"
+                >
+                  Clear Data &amp; Sign Out
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="rounded-[10px] px-4 py-2 text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </AppShell>

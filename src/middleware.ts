@@ -7,7 +7,7 @@ import type { NextRequest } from "next/server";
     Redirects to /login if no session and accessing protected route.
     ================================================================ */
 
-const PUBLIC_PATHS = ["/login", "/signup", "/api/auth"];
+const PUBLIC_PATHS = ["/login", "/signup", "/api/auth", "/landing"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

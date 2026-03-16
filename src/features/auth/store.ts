@@ -33,6 +33,18 @@ export const useAuthStore = create<AuthState>((set) => ({
   initialize: async () => {
     try {
       set({ loading: true });
+
+      // Shared-device safety: if this is a fresh browser session (no
+      // sessionStorage flag), sign out automatically so a new user
+      // doesn't land on someone else's account.
+      const sessionActive = window.sessionStorage.getItem("unfilter_active");
+      if (!sessionActive) {
+        // Clear the server-side cookie
+        await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+        set({ user: null, initialized: true, loading: false });
+        return;
+      }
+
       const res = await fetch("/api/auth/me");
       if (res.ok) {
         const data = await res.json();
@@ -75,6 +87,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       const data = await res.json();
 
       if (data.ok && data.user) {
+        // Mark this browser tab/session as actively logged in
+        window.sessionStorage.setItem("unfilter_active", "1");
         set({ user: data.user, loading: false });
         return { ok: true };
       }
@@ -97,6 +111,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch {
       // Still clear local state even if request fails
     }
+    window.sessionStorage.removeItem("unfilter_active");
     set({ user: null });
   },
 }));
