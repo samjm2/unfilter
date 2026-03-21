@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { OnboardingStep, Goal, TimeBudget } from "./types";
 import { useOnboardingStore } from "./store";
+import { useAuthStore } from "@/features/auth/store";
 import { WelcomeStep } from "./steps/WelcomeStep";
-import { PrivacyStep } from "./steps/PrivacyStep";
 import { AgeGateStep } from "./steps/AgeGateStep";
 import { Under13Step } from "./steps/Under13Step";
 import { PersonalizeStep } from "./steps/PersonalizeStep";
@@ -13,7 +13,6 @@ import { TutorialStep } from "./steps/TutorialStep";
 
 const STEP_ORDER: OnboardingStep[] = [
   "welcome",
-  "privacy",
   "age-gate",
   "personalize",
   "tutorial",
@@ -29,10 +28,14 @@ export default function OnboardingFlow() {
     setTimeBudget,
     completeOnboarding,
   } = useOnboardingStore();
+  const { user } = useAuthStore();
 
   const finish = () => {
     completeOnboarding();
-    router.push("/");
+    // Mark intro as seen so returning users skip onboarding
+    document.cookie = "unfilter_intro_done=1; max-age=31536000; path=/; SameSite=Lax";
+    // If already logged in (e.g. cleared localStorage), go straight to app
+    router.push(user ? "/" : "/login");
   };
 
   const currentIdx = STEP_ORDER.indexOf(step);
@@ -83,17 +86,7 @@ export default function OnboardingFlow() {
       <div className="flex-1 flex items-start justify-center">
         <div className="w-full">
           {step === "welcome" && (
-            <WelcomeStep onContinue={() => setStep("privacy")} />
-          )}
-
-          {step === "privacy" && (
-            <PrivacyStep
-              onAccept={() => setStep("age-gate")}
-              onDecline={() => {
-                completeOnboarding();
-                router.push("/learn");
-              }}
-            />
+            <WelcomeStep onContinue={() => setStep("age-gate")} />
           )}
 
           {step === "age-gate" && (
@@ -111,10 +104,7 @@ export default function OnboardingFlow() {
 
           {step === "complete" && (
             <Under13Step
-              onContinueLearnOnly={() => {
-                completeOnboarding();
-                router.push("/learn");
-              }}
+              onContinueLearnOnly={finish}
             />
           )}
 

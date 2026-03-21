@@ -5,9 +5,16 @@ import type { NextRequest } from "next/server";
     MIDDLEWARE — Route protection
     Runs before every request. Validates JWT structure + expiry.
     Full cryptographic verification happens in API routes.
+
+    Flow:
+      1. No JWT + no intro cookie   → /onboarding
+      2. No JWT + has intro cookie  → /login
+      3. Has JWT + no terms cookie  → /terms
+      4. Has JWT + terms cookie     → allow
     ================================================================ */
 
-const PUBLIC_PATHS = ["/login", "/signup", "/api/auth", "/landing"];
+// Always accessible without any auth or cookies
+const PUBLIC_PATHS = ["/login", "/signup", "/api/auth", "/landing", "/onboarding"];
 
 /**
  * Decode a JWT payload without cryptographic verification.
@@ -51,7 +58,13 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get("unfilter_session");
 
   if (!session?.value) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    // Returning user (has seen intro): go to login
+    const introCookie = request.cookies.get("unfilter_intro_done");
+    if (introCookie?.value) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    // First-time visitor: go to onboarding intro
+    return NextResponse.redirect(new URL("/onboarding", request.url));
   }
 
   // Validate JWT structure and check expiry
@@ -76,6 +89,15 @@ export function middleware(request: NextRequest) {
     const response = NextResponse.redirect(new URL("/login", request.url));
     response.cookies.set("unfilter_session", "", { maxAge: 0, path: "/" });
     return response;
+  }
+
+  // Authenticated — check terms acceptance
+  // /terms itself must be allowed through so the user can accept
+  if (pathname !== "/terms") {
+    const termsCookie = request.cookies.get("unfilter_terms_v1");
+    if (!termsCookie?.value) {
+      return NextResponse.redirect(new URL("/terms", request.url));
+    }
   }
 
   return NextResponse.next();
