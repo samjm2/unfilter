@@ -4,6 +4,8 @@ import type { JournalEntry } from "./types";
 
 interface JournalStore {
   entries: JournalEntry[];
+  _hasHydrated: boolean;
+  setHasHydrated: (v: boolean) => void;
   addEntry: (entry: JournalEntry) => void;
   deleteEntry: (id: string) => void;
   updateNote: (id: string, note: string) => void;
@@ -15,6 +17,8 @@ export const useJournalStore = create<JournalStore>()(
   persist(
     (set) => ({
       entries: [],
+      _hasHydrated: false,
+      setHasHydrated: (v) => set({ _hasHydrated: v }),
 
       addEntry: (entry) =>
         set((s) => ({
@@ -44,6 +48,9 @@ export const useJournalStore = create<JournalStore>()(
     }),
     {
       name: "unfilter-journal",
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     }
   )
 );

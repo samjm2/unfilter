@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { OnboardingGate } from "@/components/OnboardingGate";
-import { IconCamera, IconShield, IconArrowRight } from "@/components/icons";
+import { IconCamera, IconShield, IconArrowRight, IconSparkle } from "@/components/icons";
 
 // ============================================================
 // Distortion Lab — Guided-first, progressive disclosure
@@ -704,6 +704,35 @@ export default function DistortionLabPage() {
                   <div className="flex items-center gap-2">
                     <IconShield size={14} className="text-[var(--accent)] shrink-0" />
                     <p className="text-[11px] font-medium text-[var(--accent-dark)]">Your photo never leaves this device.</p>
+                  </div>
+                </div>
+
+                {/* What's next */}
+                <div className="card p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--text-muted)] mb-3">What&apos;s next</p>
+                  <div className="space-y-2">
+                    <a
+                      href="/check-in"
+                      className="group flex items-center gap-3 rounded-[10px] bg-[var(--accent)] px-4 py-3 text-white transition hover:bg-[var(--accent-dark)]"
+                    >
+                      <IconSparkle size={18} className="shrink-0 opacity-90" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] font-semibold leading-tight">Check In</p>
+                        <p className="text-[11px] text-white/70 leading-tight mt-0.5">See what&apos;s happening with your skin today</p>
+                      </div>
+                      <IconArrowRight size={14} className="shrink-0 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                    </a>
+                    <a
+                      href="/routine"
+                      className="group flex items-center gap-3 rounded-[10px] border border-[var(--border-light)] bg-[var(--bg-secondary)] px-4 py-3 transition hover:border-[var(--border-hover)]"
+                    >
+                      <IconShield size={18} className="shrink-0 text-[var(--coral)]" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] font-semibold text-[var(--text-primary)] leading-tight">Routine Safety</p>
+                        <p className="text-[11px] text-[var(--text-tertiary)] leading-tight mt-0.5">Avoid irritation mistakes in your routine</p>
+                      </div>
+                      <IconArrowRight size={14} className="shrink-0 text-[var(--text-muted)] opacity-0 group-hover:opacity-100 transition" />
+                    </a>
                   </div>
                 </div>
               </div>

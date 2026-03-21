@@ -21,7 +21,7 @@ type ReflectionEntry = {
 const STORAGE_KEY = "unfilter-confidence-journal-v1";
 
 export default function JournalPage() {
-  const { entries: insightEntries, deleteEntry } = useJournalStore();
+  const { entries: insightEntries, _hasHydrated, deleteEntry } = useJournalStore();
   const [reflections, setReflections] = useState<ReflectionEntry[]>([]);
   const [activeTab, setActiveTab] = useState<"reflections" | "checkins">("checkins");
   const [expandedCheckin, setExpandedCheckin] = useState<string | null>(null);
@@ -137,7 +137,13 @@ export default function JournalPage() {
           {/* ===================== CHECK-IN RECORDS TAB ===================== */}
           {activeTab === "checkins" && (
             <section className="animate-fade-up">
-              {insightEntries.length === 0 ? (
+              {!_hasHydrated ? (
+                <div className="space-y-3">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="card-elevated h-16 animate-pulse bg-[var(--bg-secondary)]" />
+                  ))}
+                </div>
+              ) : insightEntries.length === 0 ? (
                 <div className="card-elevated p-6 text-center">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[var(--accent-lighter)] mb-3">
                     <IconShield size={20} className="text-[var(--accent)]" />
