@@ -15,20 +15,26 @@ import {
   IconX,
 } from "@/components/icons";
 
-const CORE_ITEMS = [
+/* ---------- Navigation structure (mirrors SideNav) ---------- */
+
+const PRIMARY = [
+  { href: "/", label: "Home", icon: IconHome },
   { href: "/lab", label: "Distortion Lab", icon: IconCamera },
-  { href: "/routine", label: "Barrier Safety", icon: IconShield },
+];
+
+const YOUR_ROUTINE = [
+  { href: "/check-in", label: "Check-In", icon: IconSparkle },
+  { href: "/routine", label: "Routine Safety", icon: IconShield },
   { href: "/journal", label: "Journal", icon: IconJournal },
 ];
 
-const SUPPORT_ITEMS = [
-  { href: "/check-in", label: "On-Device Insight", icon: IconSparkle },
+const LEARN = [
   { href: "/learn", label: "Learn Hub", icon: IconBook },
-  { href: "/help", label: "Skin Literacy Guide", icon: IconHelp },
+  { href: "/help", label: "Skin Guide", icon: IconHelp },
+  { href: "/confidence", label: "Confidence", icon: IconSparkle },
 ];
 
-const INFRA_ITEMS = [
-  { href: "/", label: "Home", icon: IconHome },
+const BOTTOM = [
   { href: "/settings", label: "Settings", icon: IconSettings },
 ];
 
@@ -43,9 +49,7 @@ export function TopNav() {
           <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[var(--accent)]">
             <span className="text-white text-[13px] font-bold" style={{ fontFamily: "Fraunces" }}>U</span>
           </div>
-          <span className="text-display text-[18px] text-[var(--text-primary)]">
-            Unfilter
-          </span>
+          <span className="text-display text-[18px] text-[var(--text-primary)]">Unfilter</span>
         </Link>
         <button
           onClick={() => setOpen(!open)}
@@ -66,71 +70,46 @@ export function TopNav() {
 
       {open && (
         <nav className="animate-fade-up border-t border-[var(--border-light)] bg-[var(--bg-elevated)] px-5 py-4 space-y-1">
-          <SectionLabel text="Core Systems" />
-          {CORE_ITEMS.map((item) => {
-            const active = pathname === item.href;
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center gap-3.5 rounded-[12px] px-4 py-3 text-[15px] font-medium transition ${
-                  active
-                    ? "bg-[var(--accent-light)] text-[var(--accent-dark)]"
-                    : "text-[var(--text-secondary)] hover:bg-[var(--warm-200)]"
-                }`}
-              >
-                <Icon size={20} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          {PRIMARY.map((item) => <MobileLink key={item.href} item={item} pathname={pathname} onClose={() => setOpen(false)} />)}
 
-          <SectionLabel text="Supporting Systems" />
-          {SUPPORT_ITEMS.map((item) => {
-            const active = pathname === item.href;
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center gap-3.5 rounded-[12px] px-4 py-3 text-[15px] font-medium transition ${
-                  active
-                    ? "bg-[var(--accent-light)] text-[var(--accent-dark)]"
-                    : "text-[var(--text-secondary)] hover:bg-[var(--warm-200)]"
-                }`}
-              >
-                <Icon size={20} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          <SectionLabel text="Your Routine" />
+          {YOUR_ROUTINE.map((item) => <MobileLink key={item.href} item={item} pathname={pathname} onClose={() => setOpen(false)} />)}
 
-          <SectionLabel text="Infrastructure" />
-          {INFRA_ITEMS.map((item) => {
-            const active = pathname === item.href;
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center gap-3.5 rounded-[12px] px-4 py-3 text-[15px] font-medium transition ${
-                  active
-                    ? "bg-[var(--accent-light)] text-[var(--accent-dark)]"
-                    : "text-[var(--text-secondary)] hover:bg-[var(--warm-200)]"
-                }`}
-              >
-                <Icon size={20} />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
+          <SectionLabel text="Learn" />
+          {LEARN.map((item) => <MobileLink key={item.href} item={item} pathname={pathname} onClose={() => setOpen(false)} />)}
+
+          <div className="mx-2 my-2 h-px bg-[var(--border-light)]" />
+          {BOTTOM.map((item) => <MobileLink key={item.href} item={item} pathname={pathname} onClose={() => setOpen(false)} />)}
         </nav>
       )}
     </header>
+  );
+}
+
+function MobileLink({
+  item,
+  pathname,
+  onClose,
+}: {
+  item: { href: string; label: string; icon: React.ComponentType<{ size?: number; className?: string }> };
+  pathname: string;
+  onClose: () => void;
+}) {
+  const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      onClick={onClose}
+      className={`flex items-center gap-3.5 rounded-[12px] px-4 py-3 text-[15px] font-medium transition ${
+        active
+          ? "bg-[var(--accent-light)] text-[var(--accent-dark)]"
+          : "text-[var(--text-secondary)] hover:bg-[var(--warm-200)]"
+      }`}
+    >
+      <Icon size={20} />
+      <span>{item.label}</span>
+    </Link>
   );
 }
 
