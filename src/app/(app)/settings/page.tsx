@@ -14,10 +14,10 @@ import {
   savePreferences,
 } from "@/features/settings/preferences";
 
-const TEXT_SIZE_OPTIONS: { value: TextSize; label: string; preview: string }[] = [
-  { value: "small", label: "Small", preview: "Aa" },
-  { value: "medium", label: "Medium", preview: "Aa" },
-  { value: "large", label: "Large", preview: "Aa" },
+const TEXT_SIZE_OPTIONS: { value: TextSize; label: string; preview: string; previewSize: string }[] = [
+  { value: "small", label: "Small", preview: "Aa", previewSize: "text-[14px]" },
+  { value: "medium", label: "Medium", preview: "Aa", previewSize: "text-[20px]" },
+  { value: "large", label: "Large", preview: "Aa", previewSize: "text-[28px]" },
 ];
 
 const THEME_OPTIONS: { value: ThemeMode; label: string; description: string }[] = [
@@ -153,15 +153,7 @@ export default function SettingsPage() {
                       : "border-[var(--border)] bg-[var(--bg-card)] hover:border-[var(--border-hover)]"
                   }`}
                 >
-                  <p
-                    className={`leading-none mb-2 ${
-                      option.value === "small"
-                        ? "text-[16px]"
-                        : option.value === "large"
-                          ? "text-[24px]"
-                          : "text-[20px]"
-                    }`}
-                  >
+                  <p className={`leading-none mb-2 font-semibold ${option.previewSize}`}>
                     {option.preview}
                   </p>
                   <p
