@@ -1,27 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createUser, findUserByEmail, findUserByUsername, verifyUser } from "../../_lib/db";
+import { createUser, findUserByEmail, findUserByUsername, verifyUser } from "@/backend/db";
 import {
   hashPassword,
   generateVerificationToken,
   sendVerificationEmail,
-} from "../../_lib/auth";
+  hasSmtpConfigured,
+} from "@/backend/auth";
+import { rateLimit, checkOrigin } from "@/backend/security";
 
 /*  POST /api/auth/signup
     Body: { username, email, password }
-    - Validates input
-    - Checks for existing user
-    - Hashes password
-    - Creates user record
-    - If SMTP configured: sends verification email
-    - If no SMTP (dev): auto-verifies the account immediately
+    Security: rate limited (5 signups / 15 min), CSRF origin check
+    Production: requires SMTP — no auto-verify
 */
+
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
 
 export async function POST(req: NextRequest) {
   try {
+    // CSRF check
+    if (!checkOrigin(req)) {
+      return NextResponse.json(
+        { ok: false, errors: ["Request blocked."] },
+        { status: 403 },
+      );
+    }
+
+    // Rate limit: 5 signups per IP per 15 minutes
+    const rl = rateLimit("signup", 5, 15 * 60, req);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { ok: false, errors: [`Too many signup attempts. Try again in ${rl.retryAfterSec} seconds.`] },
+        { status: 429 },
+      );
+    }
+
     const body = await req.json();
     const { username, email, password } = body;
 
-    // ---- Validation ----
+    // Validation
     const errors: string[] = [];
 
     if (!username || typeof username !== "string") {
@@ -50,30 +67,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, errors }, { status: 400 });
     }
 
-    // ---- Check duplicates ----
-    if (findUserByEmail(email)) {
+    // Check duplicates — use same generic message to prevent enumeration
+    const emailExists = findUserByEmail(email);
+    const usernameExists = findUserByUsername(username);
+
+    if (emailExists || usernameExists) {
       return NextResponse.json(
-        { ok: false, errors: ["An account with this email already exists."] },
-        { status: 409 },
-      );
-    }
-    if (findUserByUsername(username)) {
-      return NextResponse.json(
-        { ok: false, errors: ["This username is taken."] },
+        { ok: false, errors: ["An account with this email or username already exists."] },
         { status: 409 },
       );
     }
 
-    // ---- Create user ----
+    // Create user
     const passwordHash = await hashPassword(password);
     const verificationToken = generateVerificationToken();
     const user = createUser(username, email, passwordHash, verificationToken);
 
-    // ---- Email verification ----
-    const hasSmtp = !!(process.env.SMTP_USER && process.env.SMTP_PASS);
-
-    if (hasSmtp) {
-      // Production: send real email, user must verify
+    // Email verification
+    if (hasSmtpConfigured()) {
       await sendVerificationEmail(email, username, verificationToken);
       return NextResponse.json({
         ok: true,
@@ -86,24 +97,38 @@ export async function POST(req: NextRequest) {
           emailVerified: false,
         },
       });
-    } else {
-      // Dev mode: auto-verify immediately so login works
-      verifyUser(user.id);
-      console.log(`\n✅ Auto-verified user "${username}" (${email}) — no SMTP configured\n`);
+    }
+
+    if (IS_PRODUCTION) {
+      // Production without SMTP = broken setup. Don't auto-verify.
+      // Account is created but unusable until SMTP is configured.
       return NextResponse.json({
         ok: true,
-        message: "Account created and verified. You can log in now.",
-        autoVerified: true,
+        message: "Account created. Email verification is temporarily unavailable. Please try again later.",
+        autoVerified: false,
         user: {
           id: user.id,
           username: user.username,
           email: user.email,
-          emailVerified: true,
+          emailVerified: false,
         },
       });
     }
-  } catch (err) {
-    console.error("Signup error:", err);
+
+    // Dev mode only: auto-verify so login works without SMTP
+    verifyUser(user.id);
+    return NextResponse.json({
+      ok: true,
+      message: "Account created and verified. You can log in now.",
+      autoVerified: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        emailVerified: true,
+      },
+    });
+  } catch {
     return NextResponse.json(
       { ok: false, errors: ["Something went wrong. Please try again."] },
       { status: 500 },

@@ -1,18 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
-import { findUserByEmail } from "../../_lib/db";
-import { verifyPassword, signToken } from "../../_lib/auth";
+import { findUserByEmail, getAccountLockRemaining, recordFailedLogin, resetFailedAttempts } from "@/backend/db";
+import { verifyPassword, signToken, hashPassword } from "@/backend/auth";
+import { rateLimit, checkOrigin } from "@/backend/security";
+
+// Pre-computed dummy hash so bcrypt.compare always runs (timing-safe)
+let DUMMY_HASH: string | null = null;
+async function getDummyHash() {
+  if (!DUMMY_HASH) DUMMY_HASH = await hashPassword("timing-safe-dummy-password");
+  return DUMMY_HASH;
+}
 
 /*  POST /api/auth/login
     Body: { email, password }
-    - Finds user by email (case-insensitive)
-    - Verifies password with bcrypt
-    - Checks email verification
-    - Sets httpOnly JWT cookie
-    - Returns user info (no sensitive data)
+    Security: rate limited, CSRF, timing-safe, account lockout
 */
 
 export async function POST(req: NextRequest) {
   try {
+    // CSRF check
+    if (!checkOrigin(req)) {
+      return NextResponse.json(
+        { ok: false, errors: ["Request blocked."] },
+        { status: 403 },
+      );
+    }
+
+    // Rate limit: 10 login attempts per IP per 15 minutes
+    const rl = rateLimit("login", 10, 15 * 60, req);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { ok: false, errors: [`Too many login attempts. Try again in ${rl.retryAfterSec} seconds.`] },
+        { status: 429 },
+      );
+    }
+
     const body = await req.json();
     const { email, password } = body;
 
@@ -25,39 +46,45 @@ export async function POST(req: NextRequest) {
 
     const trimmedEmail = email.trim().toLowerCase();
 
-    // ---- Find user ----
+    // Find user — always run bcrypt even if user doesn't exist (timing-safe)
     const user = findUserByEmail(trimmedEmail);
-    if (!user) {
-      console.log(`Login failed: no user found for email "${trimmedEmail}"`);
-      return NextResponse.json(
-        { ok: false, errors: ["Invalid email or password."] },
-        { status: 401 },
-      );
+    const hashToCompare = user?.password_hash ?? await getDummyHash();
+
+    // Check account lockout — return same message as invalid credentials
+    // to prevent attackers from discovering which emails have accounts
+    if (user) {
+      const lockSec = getAccountLockRemaining(user);
+      if (lockSec > 0) {
+        // Still run bcrypt to maintain consistent timing
+        await verifyPassword(password, hashToCompare).catch(() => {});
+        return NextResponse.json(
+          { ok: false, errors: ["Invalid email or password."] },
+          { status: 401 },
+        );
+      }
     }
 
-    // ---- Verify password ----
     let valid = false;
     try {
-      valid = await verifyPassword(password, user.password_hash);
-    } catch (err) {
-      console.error("bcrypt error:", err);
+      valid = await verifyPassword(password, hashToCompare);
+    } catch {
       return NextResponse.json(
         { ok: false, errors: ["Authentication error. Please try again."] },
         { status: 500 },
       );
     }
 
-    if (!valid) {
-      console.log(`Login failed: wrong password for "${trimmedEmail}"`);
+    if (!user || !valid) {
+      // Record failed attempt if user exists
+      if (user) recordFailedLogin(user.id);
       return NextResponse.json(
         { ok: false, errors: ["Invalid email or password."] },
         { status: 401 },
       );
     }
 
-    // ---- Check email verification ----
+    // Check email verification
     if (!user.email_verified) {
-      console.log(`Login blocked: email not verified for "${trimmedEmail}"`);
       return NextResponse.json(
         {
           ok: false,
@@ -68,7 +95,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ---- Issue JWT ----
+    // Success — reset failed attempts
+    resetFailedAttempts(user.id);
+
+    // Issue JWT
     const token = signToken({
       userId: user.id,
       email: user.email,
@@ -84,19 +114,16 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // httpOnly cookie — not accessible via JavaScript
     response.cookies.set("unfilter_session", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 7 * 24 * 60 * 60,
       path: "/",
     });
 
-    console.log(`✅ Login success: "${user.username}" (${user.email})`);
     return response;
-  } catch (err) {
-    console.error("Login error:", err);
+  } catch {
     return NextResponse.json(
       { ok: false, errors: ["Something went wrong. Please try again."] },
       { status: 500 },

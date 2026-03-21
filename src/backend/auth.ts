@@ -12,7 +12,17 @@ import nodemailer from "nodemailer";
 
 /* ---- Env ---- */
 
-const JWT_SECRET = process.env.JWT_SECRET || "unfilter-dev-secret-change-in-production";
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret && IS_PRODUCTION) {
+    throw new Error("JWT_SECRET environment variable is required in production");
+  }
+  return secret || "unfilter-dev-secret-DO-NOT-USE-IN-PROD";
+}
+
+const JWT_SECRET = getJwtSecret();
 const JWT_EXPIRES = "7d";
 const BCRYPT_ROUNDS = 12;
 
@@ -21,6 +31,21 @@ const SMTP_PORT = parseInt(process.env.SMTP_PORT || "587");
 const SMTP_USER = process.env.SMTP_USER || "";
 const SMTP_PASS = process.env.SMTP_PASS || "";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+export function hasSmtpConfigured(): boolean {
+  return !!(SMTP_USER && SMTP_PASS);
+}
+
+/* ---- HTML Safety ---- */
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 /* ---- Password ---- */
 
@@ -44,12 +69,12 @@ export interface TokenPayload {
 }
 
 export function signToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+  return jwt.sign(payload, JWT_SECRET, { algorithm: "HS256", expiresIn: JWT_EXPIRES });
 }
 
 export function verifyToken(token: string): TokenPayload | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as TokenPayload;
+    return jwt.verify(token, JWT_SECRET, { algorithms: ["HS256"] }) as TokenPayload;
   } catch {
     return null;
   }
@@ -108,7 +133,7 @@ export async function sendVerificationEmail(
           <div style="text-align: center; margin-bottom: 32px;">
             <div style="display: inline-block; background: #4a7c59; color: white; font-weight: bold; font-size: 18px; width: 44px; height: 44px; line-height: 44px; border-radius: 12px;">U</div>
           </div>
-          <h1 style="font-size: 22px; font-weight: 700; color: #2d2620; margin: 0 0 8px;">Welcome to Unfilter, ${username}</h1>
+          <h1 style="font-size: 22px; font-weight: 700; color: #2d2620; margin: 0 0 8px;">Welcome to Unfilter, ${escapeHtml(username)}</h1>
           <p style="font-size: 15px; color: #6b5e50; line-height: 1.6; margin: 0 0 28px;">
             Please verify your email address to get started. This link expires in 24 hours.
           </p>

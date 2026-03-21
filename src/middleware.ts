@@ -2,12 +2,33 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /*  ================================================================
-    MIDDLEWARE — Route protection at the edge
-    Runs before every request. Checks for session cookie.
-    Redirects to /login if no session and accessing protected route.
+    MIDDLEWARE — Route protection
+    Runs before every request. Validates JWT structure + expiry.
+    Full cryptographic verification happens in API routes.
     ================================================================ */
 
 const PUBLIC_PATHS = ["/login", "/signup", "/api/auth", "/landing"];
+
+/**
+ * Decode a JWT payload without cryptographic verification.
+ * Used in middleware to check structure and expiry quickly.
+ * Full signature verification happens server-side in API routes.
+ */
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const payload = JSON.parse(
+      Buffer.from(parts[1], "base64url").toString("utf-8"),
+    );
+
+    if (typeof payload !== "object" || payload === null) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -30,23 +51,38 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get("unfilter_session");
 
   if (!session?.value) {
-    // Redirect to login
-    const loginUrl = new URL("/login", request.url);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // Has cookie — allow through (JWT validation happens in API routes)
+  // Validate JWT structure and check expiry
+  const payload = decodeJwtPayload(session.value);
+
+  if (!payload) {
+    // Malformed token — clear it and redirect
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.set("unfilter_session", "", { maxAge: 0, path: "/" });
+    return response;
+  }
+
+  // Check required fields exist
+  if (!payload.userId || !payload.email || !payload.username) {
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.set("unfilter_session", "", { maxAge: 0, path: "/" });
+    return response;
+  }
+
+  // Check expiry
+  if (typeof payload.exp === "number" && payload.exp * 1000 < Date.now()) {
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.set("unfilter_session", "", { maxAge: 0, path: "/" });
+    return response;
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization)
-     * - favicon.ico
-     */
     "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
