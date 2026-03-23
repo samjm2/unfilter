@@ -12,6 +12,7 @@ import {
   IconSparkle,
   IconHelp,
   IconSettings,
+  IconFlame,
 } from "@/components/icons";
 
 /* ---------- Navigation structure ---------- */
@@ -28,6 +29,7 @@ const PRIMARY: NavItem[] = [
 ];
 
 const YOUR_ROUTINE: NavItem[] = [
+  { href: "/reality-check", label: "Reality Check", icon: IconFlame },
   { href: "/check-in", label: "Check-In", icon: IconSparkle },
   { href: "/routine", label: "Routine Safety", icon: IconShield },
   { href: "/journal", label: "Journal", icon: IconJournal },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 // ============================================================
@@ -17,7 +17,7 @@ import Link from "next/link";
 const CANVAS_W = 480;
 const CANVAS_H = 360;
 
-/** Generate a warm skin-textured canvas with visible pores + variation */
+/** Generate a warm skin-textured canvas with visible pores, pimples, acne, and eye bags */
 function generateSkinTexture(canvas: HTMLCanvasElement) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -29,31 +29,62 @@ function generateSkinTexture(canvas: HTMLCanvasElement) {
   ctx.fillStyle = "#d4a882";
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-  // Subtle warm patches (natural skin color variation)
-  const patches = 40;
-  for (let i = 0; i < patches; i++) {
+  // Natural color variation patches
+  for (let i = 0; i < 30; i++) {
     const x = Math.random() * CANVAS_W;
     const y = Math.random() * CANVAS_H;
-    const r = 30 + Math.random() * 60;
-    const hueShift = Math.random() * 12 - 6;
-    const lightShift = Math.random() * 8 - 4;
+    const r = 25 + Math.random() * 50;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = `hsl(${24 + hueShift}, ${45 + lightShift}%, ${68 + lightShift}%)`;
-    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = `hsla(${20 + Math.random() * 12}, ${40 + Math.random() * 15}%, ${65 + Math.random() * 10}%, 0.25)`;
     ctx.fill();
   }
-  ctx.globalAlpha = 1;
 
-  // Pores — tiny dark dots scattered across
-  const poreCount = 600;
-  for (let i = 0; i < poreCount; i++) {
+  // Dense pore texture
+  for (let i = 0; i < 900; i++) {
     const x = Math.random() * CANVAS_W;
     const y = Math.random() * CANVAS_H;
-    const size = 0.8 + Math.random() * 1.8;
+    const size = 0.7 + Math.random() * 1.6;
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fillStyle = `rgba(120, 80, 55, ${0.15 + Math.random() * 0.25})`;
+    ctx.fill();
+  }
+
+  // Under-eye dark circles
+  for (const xOff of [CANVAS_W * 0.32, CANVAS_W * 0.62]) {
+    ctx.beginPath();
+    ctx.ellipse(xOff, CANVAS_H * 0.32, 30, 10, 0, 0, Math.PI);
+    ctx.fillStyle = "rgba(120, 80, 70, 0.16)";
+    ctx.fill();
+  }
+
+  // Pimples with redness halo and highlight
+  const pimples = [
+    { x: 150, y: 180, r: 4 }, { x: 320, y: 200, r: 3.5 },
+    { x: 200, y: 250, r: 5 }, { x: 380, y: 160, r: 3 },
+    { x: 100, y: 220, r: 4.5 }, { x: 280, y: 280, r: 4 },
+  ];
+  for (const p of pimples) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * 2, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(195, 100, 80, 0.1)";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(190, 95, 75, ${0.22 + Math.random() * 0.12})`;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p.x - p.r * 0.3, p.y - p.r * 0.3, p.r * 0.35, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(240, 200, 180, 0.25)";
+    ctx.fill();
+  }
+
+  // Redness patches
+  for (const patch of [{ x: 160, y: 200, rx: 35, ry: 25 }, { x: 320, y: 210, rx: 35, ry: 25 }]) {
+    ctx.beginPath();
+    ctx.ellipse(patch.x, patch.y, patch.rx, patch.ry, 0, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(190, 110, 90, 0.07)";
     ctx.fill();
   }
 
@@ -67,25 +98,41 @@ function generateSkinTexture(canvas: HTMLCanvasElement) {
     data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
   }
   ctx.putImageData(imageData, 0, 0);
-
-  // A few slightly larger "blemish" spots
-  for (let i = 0; i < 8; i++) {
-    const x = 40 + Math.random() * (CANVAS_W - 80);
-    const y = 40 + Math.random() * (CANVAS_H - 80);
-    const r = 3 + Math.random() * 5;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(180, 100, 80, ${0.15 + Math.random() * 0.2})`;
-    ctx.fill();
-  }
 }
+
+// Known blemish positions for the demo texture (matches generateSkinTexture pimples)
+const DEMO_BLEMISHES: import("@/lib/imaging/retouch").BlemishRegion[] = [
+  { cx: 150, cy: 180, radius: 6, pixels: [] },
+  { cx: 320, cy: 200, radius: 5, pixels: [] },
+  { cx: 200, cy: 250, radius: 7, pixels: [] },
+  { cx: 380, cy: 160, radius: 5, pixels: [] },
+  { cx: 100, cy: 220, radius: 6, pixels: [] },
+  { cx: 280, cy: 280, radius: 6, pixels: [] },
+].map((b) => {
+  const pixels: Array<{ x: number; y: number }> = [];
+  for (let dy = -b.radius; dy <= b.radius; dy++)
+    for (let dx = -b.radius; dx <= b.radius; dx++)
+      if (dx * dx + dy * dy <= b.radius * b.radius)
+        pixels.push({ x: b.cx + dx, y: b.cy + dy });
+  return { ...b, pixels };
+});
+
+const DEMO_UNDER_EYES = [
+  { cx: CANVAS_W * 0.32, cy: CANVAS_H * 0.32, rx: 30, ry: 10 },
+  { cx: CANVAS_W * 0.62, cy: CANVAS_H * 0.32, rx: 30, ry: 10 },
+];
 
 export function DistortionDemo() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const originalCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [smoothing, setSmoothing] = useState(0);
   const [userPhoto, setUserPhoto] = useState<string | null>(null);
   const [textureDataUrl, setTextureDataUrl] = useState<string | null>(null);
+  const [retouchedUrl, setRetouchedUrl] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const isUsingDemo = useRef(true);
+  const retouchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Generate skin texture on mount
   useEffect(() => {
@@ -93,6 +140,12 @@ export function DistortionDemo() {
     if (!canvas) return;
     generateSkinTexture(canvas);
     setTextureDataUrl(canvas.toDataURL("image/png"));
+    // Store original canvas for retouch processing
+    const copy = document.createElement("canvas");
+    copy.width = canvas.width;
+    copy.height = canvas.height;
+    copy.getContext("2d")!.drawImage(canvas, 0, 0);
+    originalCanvasRef.current = copy;
   }, []);
 
   const handleFileChange = useCallback(
@@ -100,7 +153,22 @@ export function DistortionDemo() {
       const file = e.target.files?.[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = () => setUserPhoto(String(reader.result));
+      reader.onload = () => {
+        const dataUrl = String(reader.result);
+        isUsingDemo.current = false;
+        setUserPhoto(dataUrl);
+        setRetouchedUrl(null);
+        // Load into canvas for retouch
+        const img = new Image();
+        img.onload = () => {
+          const c = document.createElement("canvas");
+          c.width = Math.min(img.width, CANVAS_W);
+          c.height = Math.round((img.height / img.width) * c.width);
+          c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
+          originalCanvasRef.current = c;
+        };
+        img.src = dataUrl;
+      };
       reader.readAsDataURL(file);
     },
     [],
@@ -108,11 +176,37 @@ export function DistortionDemo() {
 
   const imageSrc = userPhoto ?? textureDataUrl;
 
-  const processedStyle = useMemo(() => {
-    const blur = smoothing / 25;
-    return {
-      filter: `blur(${blur.toFixed(2)}px) contrast(0.92) brightness(1.08) saturate(0.96)`,
-    } as const;
+  // Run retouch pipeline when smoothing changes (debounced)
+  useEffect(() => {
+    if (!originalCanvasRef.current || smoothing <= 0) {
+      setRetouchedUrl(null);
+      return;
+    }
+
+    if (retouchTimer.current) clearTimeout(retouchTimer.current);
+    setIsProcessing(true);
+
+    retouchTimer.current = setTimeout(async () => {
+      const { applyRetouch } = await import("@/lib/imaging/retouch");
+
+      const src = originalCanvasRef.current!;
+      const work = document.createElement("canvas");
+      work.width = src.width;
+      work.height = src.height;
+      work.getContext("2d")!.drawImage(src, 0, 0);
+
+      const result = applyRetouch(
+        work,
+        { smoothing, blemishRemoval: Math.min(100, smoothing * 1.5), eyeBagRemoval: smoothing },
+        isUsingDemo.current ? DEMO_BLEMISHES : undefined,
+        isUsingDemo.current ? DEMO_UNDER_EYES : undefined,
+      );
+
+      setRetouchedUrl(result.toDataURL("image/jpeg", 0.92));
+      setIsProcessing(false);
+    }, 150);
+
+    return () => { if (retouchTimer.current) clearTimeout(retouchTimer.current); };
   }, [smoothing]);
 
   const handleSlider = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,11 +228,11 @@ export function DistortionDemo() {
           </span>
         </div>
         <h3 className="text-title text-[18px] text-[var(--text-primary)]">
-          Drag the slider. Watch skin disappear.
+          Drag the slider. Watch pimples vanish.
         </h3>
         <p className="text-[13px] text-[var(--text-tertiary)] mt-1">
-          This is the exact type of smoothing Instagram and TikTok apply to
-          every selfie.
+          Snapchat and TikTok do this automatically — before you even
+          pick a filter. Pores, acne, eye bags: gone.
         </p>
       </div>
 
@@ -166,20 +260,26 @@ export function DistortionDemo() {
             </div>
           </div>
 
-          {/* Distorted */}
+          {/* Retouched */}
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--coral)] mb-2">
               After &ldquo;beauty filter&rdquo;
             </p>
             <div className="relative aspect-[4/3] overflow-hidden rounded-[12px] border border-[var(--border-light)] bg-[var(--bg-secondary)]">
               {imageSrc ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={imageSrc}
-                  alt="Distorted"
-                  className="h-full w-full object-cover"
-                  style={processedStyle}
-                />
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={retouchedUrl ?? imageSrc}
+                    alt="Retouched"
+                    className="h-full w-full object-cover"
+                  />
+                  {isProcessing && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                      <div className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="flex h-full items-center justify-center">
                   <div className="h-8 w-8 rounded-full border-2 border-[var(--border-hover)] border-t-[var(--coral)] animate-spin" />
@@ -194,7 +294,7 @@ export function DistortionDemo() {
       <div className="px-5 pt-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[13px] font-semibold text-[var(--text-secondary)]">
-            Smoothing
+            Retouching
           </span>
           <span className="text-[14px] font-bold text-[var(--text-primary)]">
             {smoothing}%
@@ -207,14 +307,14 @@ export function DistortionDemo() {
           value={smoothing}
           onChange={handleSlider}
           className="w-full accent-[var(--coral)] h-2 rounded-full appearance-none bg-[var(--warm-300)] cursor-pointer"
-          aria-label="Smoothing intensity"
+          aria-label="Retouching intensity"
         />
         <div className="flex justify-between mt-1">
           <span className="text-[10px] text-[var(--text-muted)]">
             No filter
           </span>
           <span className="text-[10px] text-[var(--text-muted)]">
-            Full smoothing
+            Full retouch
           </span>
         </div>
       </div>
@@ -225,10 +325,10 @@ export function DistortionDemo() {
           <div className="rounded-[var(--radius-md)] bg-[var(--coral-light)] border border-[var(--coral)]/15 px-4 py-3">
             <p className="text-[13px] font-semibold text-[var(--text-primary)]">
               {smoothing < 30
-                ? "Even a little smoothing hides real texture."
+                ? "Even at low settings, pimples start fading. Snapchat applies this level automatically."
                 : smoothing < 60
-                  ? "Pores, texture, blemishes — all vanishing. This is what you're comparing yourself to."
-                  : "This is what most selfies on social media look like before you ever see them."}
+                  ? "Pores, acne, eye bags — all vanishing. TikTok's \"Enhance\" does this by default."
+                  : "This is what most selfies look like before you see them. Every platform does this."}
             </p>
           </div>
         </div>
