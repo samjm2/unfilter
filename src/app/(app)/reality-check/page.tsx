@@ -6,11 +6,14 @@ import { AppShell } from "@/components/AppShell"
 import { OnboardingGate } from "@/components/OnboardingGate"
 import { IconArrowRight, IconFlame, IconShield } from "@/components/icons"
 import { isDoneToday, markStreakToday } from "@/features/streak"
+import { getPhotoForDay } from "@/features/reality-check/photos"
 
 type Step = "spot" | "reveal" | "done"
 
-// one scenario per day of week, cycles automatically
+/* ── 14 scenario templates (two per day-of-week, alternates weekly) ── */
+
 const DAILY_SCENARIOS = [
+  // Sunday – two options
   {
     edits: 3,
     label: "Snapchat selfie",
@@ -18,6 +21,14 @@ const DAILY_SCENARIOS = [
     insight: "3 edits. Snapchat did all of them automatically.",
     distortion: { skinTexture: 20, faceShape: 5, lightingTone: 20, makeup: 0 },
   },
+  {
+    edits: 5,
+    label: "Snapchat Glow filter",
+    what: "Skin texture removal, eye whitening, soft-focus vignette, warm color cast, virtual highlight on cheekbones",
+    insight: "5 edits — all invisible, all automatic. Snapchat's 'Glow' does this to every face.",
+    distortion: { skinTexture: 35, faceShape: 10, lightingTone: 35, makeup: 15 },
+  },
+  // Monday
   {
     edits: 6,
     label: "Instagram story",
@@ -27,11 +38,27 @@ const DAILY_SCENARIOS = [
   },
   {
     edits: 4,
+    label: "Instagram Reels",
+    what: "Auto-enhance on upload, subtle face reshape, color grading, micro-smoothing on skin",
+    insight: "4 changes happen automatically when you upload a Reel. Most creators don't even know.",
+    distortion: { skinTexture: 30, faceShape: 20, lightingTone: 45, makeup: 10 },
+  },
+  // Tuesday
+  {
+    edits: 4,
     label: "Instagram brand collab",
     what: "Pore and acne removal, studio-quality color grade, brightness +18%, soft glow",
     insight: "4 invisible changes. The influencer was paid to look like this.",
     distortion: { skinTexture: 40, faceShape: 15, lightingTone: 70, makeup: 20 },
   },
+  {
+    edits: 8,
+    label: "Magazine cover edit",
+    what: "Professional retouching: skin smoothing, under-eye removal, jaw reshape, neck slim, teeth whiten, color grade, pore erase, blemish removal",
+    insight: "8 edits. Every magazine cover goes through this. It's not real — it's a product.",
+    distortion: { skinTexture: 70, faceShape: 45, lightingTone: 55, makeup: 40 },
+  },
+  // Wednesday
   {
     edits: 9,
     label: "Facetune'd post",
@@ -40,12 +67,28 @@ const DAILY_SCENARIOS = [
     distortion: { skinTexture: 80, faceShape: 60, lightingTone: 50, makeup: 55 },
   },
   {
+    edits: 6,
+    label: "Facetune 'Natural' preset",
+    what: "Even the 'natural' preset applies: pore blur, undereye lighten, skin even, subtle slim, brightness boost, warmth shift",
+    insight: "6 changes from a preset literally called 'Natural.' The name is the deception.",
+    distortion: { skinTexture: 45, faceShape: 25, lightingTone: 40, makeup: 20 },
+  },
+  // Thursday
+  {
     edits: 5,
     label: "TikTok fitness post",
     what: "TikTok \"Enhance\" (auto-smooth + face slim), contrast pop, acne removal, subtle sculpting",
     insight: "The 'no-filter' caption was a lie. TikTok's Enhance was on.",
     distortion: { skinTexture: 45, faceShape: 25, lightingTone: 40, makeup: 15 },
   },
+  {
+    edits: 3,
+    label: "TikTok GRWM video",
+    what: "Background auto-smooth on skin, lighting boost, subtle face reshape — all before the makeup even starts",
+    insight: "3 edits were already applied before the 'Get Ready With Me' even began.",
+    distortion: { skinTexture: 25, faceShape: 15, lightingTone: 30, makeup: 5 },
+  },
+  // Friday
   {
     edits: 7,
     label: "TikTok Bold Glamour",
@@ -54,13 +97,37 @@ const DAILY_SCENARIOS = [
     distortion: { skinTexture: 55, faceShape: 40, lightingTone: 35, makeup: 45 },
   },
   {
+    edits: 5,
+    label: "YouTube thumbnail",
+    what: "Skin airbrush, eye pop (saturation + brightness), contrast boost, teeth whitening, subtle face reshape",
+    insight: "5 edits on a single thumbnail. Creators do this to every video preview.",
+    distortion: { skinTexture: 40, faceShape: 20, lightingTone: 50, makeup: 25 },
+  },
+  // Saturday
+  {
     edits: 4,
     label: "BeReal post",
     what: "Auto-exposure boost, white balance shift, subtle texture smooth, warmth correction",
     insight: "4 tweaks. Even \"no filter\" platforms process your photo.",
     distortion: { skinTexture: 30, faceShape: 10, lightingTone: 60, makeup: 25 },
   },
+  {
+    edits: 2,
+    label: "iPhone Portrait Mode",
+    what: "Computational skin smoothing in 'Deep Fusion' processing, plus background blur that pulls focus to the face",
+    insight: "2 edits you never asked for. Your phone does this automatically in Portrait Mode.",
+    distortion: { skinTexture: 15, faceShape: 5, lightingTone: 25, makeup: 0 },
+  },
 ]
+
+function getScenarioForDay(): (typeof DAILY_SCENARIOS)[0] {
+  const now = new Date()
+  const dayOfWeek = now.getDay() // 0-6
+  const weekNumber = Math.floor(now.getTime() / (7 * 86_400_000))
+  // Two scenarios per day-of-week, alternate by even/odd week
+  const idx = dayOfWeek * 2 + (weekNumber % 2)
+  return DAILY_SCENARIOS[idx]
+}
 
 function buildFilter(d: (typeof DAILY_SCENARIOS)[0]["distortion"]) {
   const blur = (d.skinTexture / 100) * 2.8
@@ -70,57 +137,18 @@ function buildFilter(d: (typeof DAILY_SCENARIOS)[0]["distortion"]) {
   return `blur(${blur.toFixed(2)}px) brightness(${brightness.toFixed(3)}) saturate(${saturate.toFixed(3)})${sepia > 0.005 ? ` sepia(${sepia.toFixed(3)})` : ""}`
 }
 
-// slightly different from the lab demo to look like a different approach
-function generateImage(): Promise<string> {
-  return new Promise((resolve) => {
-    const c = document.createElement("canvas")
-    c.width = 380
-    c.height = 480
-    const ctx = c.getContext("2d")!
-
-    const grad = ctx.createLinearGradient(0, 0, 0, 480)
-    grad.addColorStop(0, "#e4c4a0")
-    grad.addColorStop(0.45, "#cc9e6a")
-    grad.addColorStop(1, "#b88550")
-    ctx.fillStyle = grad
-    ctx.fillRect(0, 0, 380, 480)
-
-    // skin texture noise
-    for (let i = 0; i < 6500; i++) {
-      const x = Math.random() * 380
-      const y = Math.random() * 480
-      ctx.beginPath()
-      ctx.arc(x, y, Math.random() * 2 + 0.3, 0, Math.PI * 2)
-      ctx.fillStyle = `rgba(${90 + Math.random() * 70},${60 + Math.random() * 50},${40 + Math.random() * 30},${Math.random() * 0.14})`
-      ctx.fill()
-    }
-
-    for (let i = 0; i < 4; i++) {
-      ctx.beginPath()
-      ctx.arc(130 + Math.random() * 120, 160 + Math.random() * 160, 2 + Math.random() * 3.5, 0, Math.PI * 2)
-      ctx.fillStyle = `rgba(170,95,75,${0.12 + Math.random() * 0.13})`
-      ctx.fill()
-    }
-
-    resolve(c.toDataURL("image/jpeg", 0.88))
-  })
-}
-
 export default function RealityCheckPage() {
   const router = useRouter()
   const [step, setStep] = useState<Step>("spot")
   const [guess, setGuess] = useState(5)
-  const [imgSrc, setImgSrc] = useState<string | null>(null)
+  const [imgLoaded, setImgLoaded] = useState(false)
+  const [imgError, setImgError] = useState(false)
   const [streakCount, setStreakCount] = useState(0)
   const alreadyDone = useRef(isDoneToday())
 
-  const dayIdx = new Date().getDay()
-  const scenario = DAILY_SCENARIOS[dayIdx]
+  const scenario = getScenarioForDay()
   const filterCSS = buildFilter(scenario.distortion)
-
-  useEffect(() => {
-    generateImage().then(setImgSrc)
-  }, [])
+  const todayPhoto = getPhotoForDay()
 
   const handleReveal = () => setStep("reveal")
 
@@ -171,21 +199,29 @@ export default function RealityCheckPage() {
                 </p>
               </div>
 
-              {imgSrc ? (
-                <div className="card-elevated overflow-hidden mb-5 rounded-[16px]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={imgSrc}
-                    alt="today's photo"
-                    className="w-full aspect-[4/5] object-cover"
-                    style={{ filter: filterCSS }}
-                  />
-                </div>
-              ) : (
-                <div className="card-elevated aspect-[4/5] mb-5 flex items-center justify-center rounded-[16px]">
-                  <div className="h-8 w-8 rounded-full bg-[var(--warm-200)] animate-pulse" />
-                </div>
-              )}
+              <div className="card-elevated overflow-hidden mb-5 rounded-[16px] aspect-[4/5] relative">
+                {!imgLoaded && !imgError && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                    <div className="h-8 w-8 rounded-full bg-[var(--warm-200)] animate-pulse" />
+                    <p className="text-[11px] text-[var(--text-muted)]">Loading today&apos;s photo…</p>
+                  </div>
+                )}
+                {imgError && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--warm-200)]">
+                    <p className="text-[13px] text-[var(--text-muted)] mb-1">Photo unavailable</p>
+                    <p className="text-[11px] text-[var(--text-muted)]">Check your connection and refresh</p>
+                  </div>
+                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={todayPhoto.url}
+                  alt={todayPhoto.alt}
+                  className={`w-full h-full object-cover transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+                  style={{ filter: filterCSS }}
+                  onLoad={() => setImgLoaded(true)}
+                  onError={() => setImgError(true)}
+                />
+              </div>
 
               <div className="card p-5 mb-4">
                 <div className="flex items-center justify-between mb-3">
@@ -214,7 +250,7 @@ export default function RealityCheckPage() {
             </>
           )}
 
-          {step === "reveal" && imgSrc && (
+          {step === "reveal" && (
             <>
               <div className="mb-5">
                 <p className="label-evidence text-[var(--text-muted)] mb-2">Revealed</p>
@@ -235,7 +271,7 @@ export default function RealityCheckPage() {
                   <p className="label-evidence text-[var(--accent)] mb-1.5 px-1">Truth</p>
                   <div className="card-elevated overflow-hidden rounded-[14px]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={imgSrc} alt="original" className="w-full aspect-[4/5] object-cover" />
+                    <img src={todayPhoto.url} alt={`${todayPhoto.alt} — unedited`} className="w-full aspect-[4/5] object-cover" />
                   </div>
                 </div>
                 <div>
@@ -243,8 +279,8 @@ export default function RealityCheckPage() {
                   <div className="card-elevated overflow-hidden rounded-[14px]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={imgSrc}
-                      alt="filtered"
+                      src={todayPhoto.url}
+                      alt={`${todayPhoto.alt} — with ${scenario.edits} hidden edits`}
                       className="w-full aspect-[4/5] object-cover"
                       style={{ filter: filterCSS }}
                     />

@@ -14,6 +14,7 @@ import {
   IconSettings,
   IconFlame,
   IconSearch,
+  IconUsers,
 } from "@/components/icons";
 
 /* ---------- Navigation structure ---------- */
@@ -41,6 +42,10 @@ const LEARN: NavItem[] = [
   { href: "/learn", label: "Learn Hub", icon: IconBook },
   { href: "/help", label: "Skin Guide", icon: IconHelp },
   { href: "/confidence", label: "Confidence", icon: IconSparkle },
+];
+
+const CONNECT: NavItem[] = [
+  { href: "/community", label: "Trusted Circle", icon: IconUsers },
 ];
 
 interface SideNavProps {
@@ -79,6 +84,16 @@ export function SideNav({ isOpen }: SideNavProps) {
         <div className="mb-2">
           <SectionLabel text="Learn" />
           {LEARN.map((item) => (
+            <NavLink key={item.href} item={item} pathname={pathname} />
+          ))}
+        </div>
+
+        <Divider />
+
+        {/* Connect */}
+        <div className="mb-2">
+          <SectionLabel text="Connect" />
+          {CONNECT.map((item) => (
             <NavLink key={item.href} item={item} pathname={pathname} />
           ))}
         </div>
