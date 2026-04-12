@@ -41,6 +41,16 @@ export async function GET(req: NextRequest) {
     return response;
   }
 
+  // Token-version check: if the user reset their password (or otherwise
+  // bumped token_version), every previously-issued JWT is invalidated.
+  const currentVersion = user.token_version ?? 0;
+  const tokenVersion = (payload as { tokenVersion?: number }).tokenVersion ?? 0;
+  if (tokenVersion !== currentVersion) {
+    const response = NextResponse.json({ ok: false, user: null }, { status: 401 });
+    response.cookies.set("unfilter_session", "", { maxAge: 0, path: "/" });
+    return response;
+  }
+
   return NextResponse.json({
     ok: true,
     user: {

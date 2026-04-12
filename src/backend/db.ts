@@ -49,6 +49,37 @@ function getDb() {
     try {
       db.exec(`ALTER TABLE users ADD COLUMN locked_until INTEGER DEFAULT 0`);
     } catch { /* column already exists */ }
+
+    // Add password reset columns
+    try {
+      db.exec(`ALTER TABLE users ADD COLUMN reset_token TEXT`);
+    } catch { /* column already exists */ }
+    try {
+      db.exec(`ALTER TABLE users ADD COLUMN reset_expires INTEGER`);
+    } catch { /* column already exists */ }
+    try {
+      db.exec(`ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0`);
+    } catch { /* column already exists */ }
+
+    // Case-insensitive uniqueness on username. Wrapped in try/catch so an
+    // existing DB with two same-letter usernames in different cases doesn't
+    // crash startup — the constraint will simply not be added until the
+    // collision is resolved manually.
+    try {
+      db.exec(
+        `CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username_nocase
+         ON users(username COLLATE NOCASE)`,
+      );
+    } catch (err) {
+      console.warn(
+        "[auth-db] Could not create case-insensitive username index:",
+        (err as Error).message,
+      );
+    }
+
+    db.exec(
+      `CREATE INDEX IF NOT EXISTS idx_users_reset ON users(reset_token)`,
+    );
   }
   return db;
 }
@@ -65,6 +96,9 @@ export interface User {
   verification_expires: number | null;
   failed_attempts: number;
   locked_until: number;
+  reset_token: string | null;
+  reset_expires: number | null;
+  token_version: number;
   created_at: number;
   updated_at: number;
 }
@@ -97,7 +131,9 @@ export function findUserByEmail(email: string): User | null {
 
 export function findUserByUsername(username: string): User | null {
   const d = getDb();
-  return d.prepare("SELECT * FROM users WHERE username = ?").get(username) as User | null;
+  return d
+    .prepare("SELECT * FROM users WHERE username = ? COLLATE NOCASE")
+    .get(username) as User | null;
 }
 
 export function findUserById(id: string): User | null {
@@ -183,4 +219,59 @@ export function resetVerificationToken(id: string, token: string): void {
     UPDATE users SET verification_token = ?, verification_expires = ?, updated_at = ?
     WHERE id = ?
   `).run(token, expires, Date.now(), id);
+}
+
+/* ---- Password reset ---- */
+
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+/** Set a password reset token for the user, valid for 1 hour. */
+export function setResetToken(id: string, token: string): void {
+  const d = getDb();
+  const expires = Date.now() + RESET_TOKEN_TTL_MS;
+  d.prepare(
+    `UPDATE users SET reset_token = ?, reset_expires = ?, updated_at = ? WHERE id = ?`,
+  ).run(token, expires, Date.now(), id);
+}
+
+export function findUserByResetToken(token: string): User | null {
+  const d = getDb();
+  return d
+    .prepare("SELECT * FROM users WHERE reset_token = ?")
+    .get(token) as User | null;
+}
+
+/**
+ * Apply a new password after a successful reset. Clears the reset token,
+ * resets failed-attempt counters, and bumps token_version so any existing
+ * JWTs for this user are invalidated.
+ */
+export function applyPasswordReset(id: string, passwordHash: string): void {
+  const d = getDb();
+  d.prepare(
+    `UPDATE users
+     SET password_hash = ?,
+         reset_token = NULL,
+         reset_expires = NULL,
+         failed_attempts = 0,
+         locked_until = 0,
+         token_version = COALESCE(token_version, 0) + 1,
+         updated_at = ?
+     WHERE id = ?`,
+  ).run(passwordHash, Date.now(), id);
+}
+
+/** Remove expired reset tokens. */
+export function cleanupExpiredResetTokens(): number {
+  const d = getDb();
+  const result = d
+    .prepare(
+      `UPDATE users
+       SET reset_token = NULL, reset_expires = NULL, updated_at = ?
+       WHERE reset_token IS NOT NULL
+         AND reset_expires IS NOT NULL
+         AND reset_expires < ?`,
+    )
+    .run(Date.now(), Date.now());
+  return result.changes;
 }

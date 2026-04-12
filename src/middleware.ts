@@ -14,7 +14,15 @@ import type { NextRequest } from "next/server";
     ================================================================ */
 
 // Always accessible without any auth or cookies
-const PUBLIC_PATHS = ["/login", "/signup", "/api/auth", "/landing", "/onboarding"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/api/auth",
+  "/landing",
+  "/onboarding",
+];
 
 /**
  * Decode a JWT payload without cryptographic verification.

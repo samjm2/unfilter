@@ -16,6 +16,7 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<string[]>([]);
   const [showVerified, setShowVerified] = useState(false);
+  const [showResetDone, setShowResetDone] = useState(false);
   const [needsVerification, setNeedsVerification] = useState(false);
 
   useEffect(() => {
@@ -25,6 +26,9 @@ function LoginForm() {
   useEffect(() => {
     if (searchParams.get("verified") === "true") {
       setShowVerified(true);
+    }
+    if (searchParams.get("reset") === "true") {
+      setShowResetDone(true);
     }
     const err = searchParams.get("error");
     if (err === "invalid_token") setErrors(["Invalid verification link."]);
@@ -74,6 +78,15 @@ function LoginForm() {
         </div>
       )}
 
+      {/* Reset done banner */}
+      {showResetDone && (
+        <div className="card-gradient-sage rounded-[var(--radius-md)] px-5 py-4 mb-6 animate-fade-up">
+          <p className="text-[14px] font-medium text-[var(--accent-dark)]">
+            Password reset. Log in with your new password.
+          </p>
+        </div>
+      )}
+
       {/* Needs verification banner */}
       {needsVerification && (
         <div className="rounded-[var(--radius-md)] bg-[var(--amber-light)] border border-[var(--amber)]/20 px-5 py-4 mb-6 animate-fade-up">
@@ -111,9 +124,17 @@ function LoginForm() {
 
         {/* Password */}
         <div>
-          <label className="block text-[13px] font-semibold text-[var(--text-secondary)] mb-2">
-            Password
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-[13px] font-semibold text-[var(--text-secondary)]">
+              Password
+            </label>
+            <Link
+              href="/forgot-password"
+              className="text-[12px] font-semibold text-[var(--accent)] hover:text-[var(--accent-dark)] transition"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <input
             type="password"
             value={password}

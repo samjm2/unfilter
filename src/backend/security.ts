@@ -16,6 +16,40 @@ interface RateLimitEntry {
 const stores = new Map<string, Map<string, RateLimitEntry>>();
 
 /**
+ * Resolve the client IP for rate-limiting purposes.
+ *
+ * Trust order:
+ *   1. If TRUSTED_IP_HEADER is set, ONLY that header is trusted. Use this in
+ *      production behind a proxy that overwrites it (Vercel sets
+ *      `x-vercel-forwarded-for`, Cloudflare sets `cf-connecting-ip`, etc.).
+ *   2. Otherwise, use NextRequest.ip if the runtime provides it (Edge).
+ *   3. In real local development only, fall back to `x-forwarded-for`.
+ *   4. Anything else collapses into a single shared bucket so the rate limit
+ *      degrades to a *global* limit instead of failing open. This makes a
+ *      misconfiguration noisy rather than silently bypassable.
+ */
+function getClientIp(req: NextRequest): string {
+  const trustedHeader = process.env.TRUSTED_IP_HEADER;
+  if (trustedHeader) {
+    const raw = req.headers.get(trustedHeader);
+    if (raw) return raw.split(",")[0]?.trim() || "unknown";
+  }
+
+  const reqIp = (req as unknown as { ip?: string }).ip;
+  if (reqIp) return reqIp;
+
+  if (process.env.NODE_ENV === "development") {
+    const xff = req.headers.get("x-forwarded-for");
+    if (xff) return xff.split(",")[0]?.trim() || "unknown";
+    return req.headers.get("x-real-ip") || "unknown";
+  }
+
+  // Production with no configured trusted header AND no req.ip:
+  // bucket all requests together so the rate limit still applies globally.
+  return "untrusted-source";
+}
+
+/**
  * In-memory rate limiter keyed by IP address.
  * Returns { allowed, remaining, retryAfterSec }.
  *
@@ -33,10 +67,7 @@ export function rateLimit(
   if (!stores.has(name)) stores.set(name, new Map());
   const store = stores.get(name)!;
 
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown";
+  const ip = getClientIp(req);
 
   const now = Date.now();
   const entry = store.get(ip);
@@ -75,10 +106,12 @@ export function checkOrigin(req: NextRequest): boolean {
   const origin = req.headers.get("origin");
   const referer = req.headers.get("referer");
 
-  // In development, allow requests without origin (e.g. Postman, curl)
-  if (process.env.NODE_ENV !== "production") return true;
+  // Allow tools without an Origin header (Postman, curl) ONLY in real local
+  // development. Any other NODE_ENV (production, staging, test, undefined)
+  // must enforce origin checks — staging deploys are still attacker-reachable.
+  if (process.env.NODE_ENV === "development") return true;
 
-  const appOrigin =  new URL(APP_URL).origin;
+  const appOrigin = new URL(APP_URL).origin;
 
   if (origin) return origin === appOrigin;
   if (referer) {

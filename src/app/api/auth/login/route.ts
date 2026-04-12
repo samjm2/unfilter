@@ -98,6 +98,7 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       email: user.email,
       username: user.username,
+      tokenVersion: user.token_version ?? 0,
     });
 
     const response = NextResponse.json({
