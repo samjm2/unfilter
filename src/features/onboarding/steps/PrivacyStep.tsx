@@ -252,7 +252,7 @@ function PrivacyContent() {
         removed); (b) skin metrics and analysis results; (c) symptom and
         context questionnaire responses; (d) routine preferences and journal
         entries; (e) onboarding preferences (age group, goals, sensitivities).
-        All locally stored data is encrypted using device-level encryption.
+        All locally stored data stays on this device and is never uploaded.
       </Section>
 
       <Section title="5. Automatic Data Deletion">
@@ -309,9 +309,8 @@ function PrivacyContent() {
 
       <Section title="12. Security">
         We implement appropriate technical measures to protect data stored on
-        your device, including encryption of saved check-in data. However, no
-        method of electronic storage is 100% secure, and we cannot guarantee
-        absolute security of locally stored data.
+        your device. However, no method of electronic storage is 100% secure,
+        and we cannot guarantee absolute security of locally stored data.
       </Section>
 
       <Section title="13. Your Rights">

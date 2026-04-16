@@ -303,7 +303,7 @@ export default function SignupPage() {
           <p className="mt-6 text-center text-[12px] text-[var(--text-muted)] leading-relaxed animate-fade-in stagger-4">
             We only store your username, email, and hashed password.
             <br />
-            All skin data is encrypted and stays on your device.
+            All skin data stays on your device.
           </p>
         </div>
       </div>

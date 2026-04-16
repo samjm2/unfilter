@@ -311,8 +311,8 @@ export function ResultsCard({
           Save this check-in?
         </h3>
         <p className="text-[11px] text-[var(--text-muted)] mb-3">
-          Saving stores an encrypted copy on your device so you can track
-          changes over time. Photos are auto-deleted by default — only metrics are kept.
+          Saving stores a copy on your device so you can track changes over time.
+          Photos are auto-deleted by default — only metrics are kept.
         </p>
         <div className="flex gap-2">
           <button

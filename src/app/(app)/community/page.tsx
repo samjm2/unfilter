@@ -178,7 +178,7 @@ export default function CommunityPage() {
                   </p>
                   <p className="text-[13px] text-[var(--text-secondary)] leading-relaxed">
                     You can set up your circle and configure privacy controls now.
-                    Actual sharing will be enabled in a future update with end-to-end encryption.
+                    Actual sharing will be enabled in a future update.
                   </p>
                 </div>
               </div>
@@ -437,8 +437,7 @@ export default function CommunityPage() {
           <div className="mt-8 text-center animate-fade-up stagger-5">
             <p className="text-[11px] text-[var(--text-muted)] leading-relaxed max-w-sm mx-auto">
               Trusted Circle is designed around consent and control. No data is shared
-              until you explicitly approve it. All sharing will use end-to-end encryption
-              when the feature launches.
+              until you explicitly approve it.
             </p>
           </div>
         </div>
