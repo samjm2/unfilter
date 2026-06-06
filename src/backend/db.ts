@@ -210,6 +210,12 @@ export function updatePassword(id: string, passwordHash: string): void {
   );
 }
 
+/** Permanently delete a user. Returns true if a row was removed. */
+export function deleteUserById(id: string): boolean {
+  const d = getDb();
+  return d.prepare("DELETE FROM users WHERE id = ?").run(id).changes > 0;
+}
+
 /* ---- Account Lockout ---- */
 
 const MAX_FAILED_ATTEMPTS = 5;

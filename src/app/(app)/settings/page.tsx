@@ -49,11 +49,40 @@ function useAccessibilityPreferences() {
 
 export default function SettingsPage() {
   const { preferences, updatePreferences } = useAccessibilityPreferences();
-  const { logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const router = useRouter();
   const [autoDeleteEnabled, setAutoDeleteEnabled] = useState(true);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleDeleteAccount = useCallback(async () => {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch("/api/auth/delete", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.errors?.[0] ?? "Could not delete your account. Try again.");
+      }
+      for (let i = window.localStorage.length - 1; i >= 0; i -= 1) {
+        const key = window.localStorage.key(i);
+        if (!key || !key.startsWith("unfilter-")) continue;
+        window.localStorage.removeItem(key);
+      }
+      resetPreferences();
+      router.replace("/landing");
+    } catch (err) {
+      setDeleteError((err as Error).message);
+      setDeleting(false);
+    }
+  }, [router]);
 
   const contrastEnabled = preferences.contrast === "high";
   const textSizeLabel = useMemo(
@@ -353,6 +382,79 @@ export default function SettingsPage() {
                 <button
                   type="button"
                   onClick={() => setShowLogoutConfirm(false)}
+                  className="rounded-[10px] px-4 py-2 text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Danger Zone — permanent account deletion */}
+        <section className="card-elevated p-6 md:p-7 mt-5 border-[var(--coral)]/30">
+          <div className="mb-4">
+            <p className="text-title text-[19px] text-[var(--coral)]">Danger Zone</p>
+            <p className="text-[14px] text-[var(--text-tertiary)]">
+              Permanently delete your account and all server-side auth data. This is irreversible.
+            </p>
+          </div>
+
+          {!showDeleteAccount ? (
+            <button
+              type="button"
+              onClick={() => {
+                setShowDeleteAccount(true);
+                setDeleteConfirmText("");
+                setDeleteError(null);
+              }}
+              className="rounded-[10px] border border-[var(--coral)]/40 bg-[var(--coral)]/10 px-4 py-2.5 text-[13px] font-semibold text-[var(--coral)] hover:bg-[var(--coral)]/20 transition"
+            >
+              Delete Account
+            </button>
+          ) : (
+            <div className="rounded-[14px] bg-[var(--coral-light)] border border-[var(--coral)]/20 p-4 animate-fade-up">
+              <p className="text-[14px] font-semibold text-[var(--text-primary)] mb-1">
+                This deletes your Unfilter account forever.
+              </p>
+              <p className="text-[12px] text-[var(--text-tertiary)] mb-4">
+                Your account row, email, and password hash will be removed from the auth database.
+                On-device data (journal, routines) will also be cleared. You will be signed out and
+                returned to the landing page. To confirm, type your username
+                <strong className="text-[var(--text-primary)]"> {user?.username ?? ""}</strong> below.
+              </p>
+
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder={user?.username ?? "your username"}
+                aria-label="Type your username to confirm account deletion"
+                className="w-full rounded-[10px] border border-[var(--border)] bg-white px-3 py-2 text-[14px] text-[var(--text-primary)] mb-3 focus:outline-none focus:border-[var(--coral)]"
+                disabled={deleting}
+              />
+
+              {deleteError && (
+                <p className="text-[12px] text-[var(--coral)] mb-3">{deleteError}</p>
+              )}
+
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deleting || !user?.username || deleteConfirmText !== user.username}
+                  className="rounded-[10px] bg-[var(--coral)] px-4 py-2 text-[13px] font-semibold text-white hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {deleting ? "Deleting…" : "Permanently delete my account"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDeleteAccount(false);
+                    setDeleteConfirmText("");
+                    setDeleteError(null);
+                  }}
+                  disabled={deleting}
                   className="rounded-[10px] px-4 py-2 text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition"
                 >
                   Cancel
