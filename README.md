@@ -43,16 +43,63 @@ If you don't trust the claim, don't trust it — open the tab and watch.
 - NextAuth v5 (Google + Microsoft OAuth)
 - pnpm
 
-## Local development
+## Running locally
+
+**Requirements:** Node.js 18+ and pnpm (`npm i -g pnpm` if you don't have it).
+
+### 1. Install dependencies
 
 ```bash
 pnpm install
+```
+
+### 2. Set up environment variables
+
+```bash
+cp .env.example .env.local
+```
+
+That's it for local development — the defaults in `.env.example` work as-is. You do not need to configure SMTP or OAuth to run the app locally. Verification emails print to the terminal console instead.
+
+If you want to change the JWT secret (recommended): open `.env.local` and replace `change-this-to-a-random-secret-in-production` with any random string.
+
+### 3. Start the dev server
+
+```bash
 pnpm dev
 ```
 
-Then open http://localhost:3000.
+Open http://localhost:3000. The auth database is created automatically at `data/auth.db` on first run.
 
-Copy `.env.example` to `.env.local` and fill in `JWT_SECRET`, SMTP credentials (used for verification emails — logs to console in development), and `NEXT_PUBLIC_APP_URL`. The auth database is created automatically at `data/auth.db` on first run.
+### 4. See it with real data (recommended)
+
+Create a demo account and populate it with 14 days of realistic journal entries and a 9-day streak:
+
+```bash
+node scripts/seed-demo-sqlite.js
+```
+
+Then:
+1. Go to http://localhost:3000/login
+2. Log in as `demo@unfilter.app` / `DemoUser2026!`
+3. Open browser DevTools → Console tab
+4. Paste the entire contents of `scripts/seed-demo-browser.js` and press Enter
+5. Reload the page
+
+You should see a fully populated journal, check-in history, and streak.
+
+### Key routes to explore
+
+| Route | What it is |
+|---|---|
+| `/landing` | Public landing page with the before/after slider |
+| `/lab` | Distortion Lab — upload a photo, watch filters apply |
+| `/detector` | Filter Detector — analyze a photo for filter use |
+| `/check-in` | Daily skin check-in (works best on mobile/iPhone Safari) |
+| `/journal` | Journal timeline and trends |
+| `/confidence` | Media literacy cards |
+| `/reality-check` | Daily filter education with streak tracking |
+| `/settings` | Privacy controls, theme, text size |
 
 ## Project structure
 
@@ -67,14 +114,4 @@ src/
   styles/         Global CSS and design tokens
   middleware.ts   JWT session check and route protection
 ```
-
-## Demo data
-
-To populate a fresh install with realistic demo data for video recording:
-
-```bash
-node scripts/seed-demo-sqlite.js
-```
-
-Then log in as `demo@unfilter.app` / `DemoUser2026!` and paste the contents of `scripts/seed-demo-browser.js` into the browser DevTools console. Reload the page — you should see 14 days of journal entries and a 9-day streak.
 
