@@ -8,6 +8,12 @@ Everything you need to talk about, pitch, and demo Unfilter for the Congressiona
 
 This is the version to lead with. It's the README opening, the demo voiceover spine, and the line you say if a judge asks "why did you build this."
 
+> I started building a skincare tracking app. Then I realized two things: skincare apps already exist, and anything that analyzes your skin and tells you what's wrong with it is dangerously close to medical advice a teenager shouldn't be giving.
+>
+> So I asked myself what the actual root problem was.
+>
+> It wasn't that teens needed better skincare tools. It was that they couldn't see their real skin at all — because filters had already replaced it as the reference image.
+>
 > I watched my cousin take the same photo fifteen times.
 >
 > Different angles, different lighting, different filters. Every version got deleted. They weren't trying to look good — they were trying to look like the version of themself the filter showed them. And when they couldn't, they put their phone face-down on the table and didn't say anything.
@@ -47,25 +53,27 @@ Variants:
 
 > Up to 95% of US teens use a social media platform, and the Surgeon General has called the youth mental-health crisis the defining public health issue of our time. By the time you're 14, the face you see on your phone isn't yours, and the face you see on your friends isn't theirs either.
 >
-> I'm Jotin, a freshman at Stevenson. I built Unfilter because I watched my cousin take the same photo fifteen times and then put their phone face-down on the table without saying anything.
+> I'm Jotin, a sophomore at Stevenson. I started building a skincare app — then realized skincare apps already exist, and anything that tells a teen what's wrong with their skin is dangerously close to medical advice. So I asked what the actual root problem was. It wasn't that teens needed better skincare tools. It was that filters had already replaced their real face as the reference image.
 >
-> Unfilter has three parts. A Distortion Lab that takes a photo and shows you, pore by pore, what a filter actually does to a face. A private check-in that uses on-device computer vision to track real skin — no photo ever leaves the phone. And a Confidence library that teaches the media literacy nobody teaches in health class.
+> I watched my cousin take the same photo fifteen times and put their phone face-down on the table without saying anything. That's why I built Unfilter.
 >
-> It's free, it's open, it runs in any browser, and there's no account needed to try the Distortion Lab. I want every freshman in IL-10 to be able to see, in 30 seconds, that the face on their screen isn't real.
+> The Distortion Lab shows you pore by pore what a filter actually does to a face. The Filter Detector shows you what was done to photos you're already comparing yourself to. And it all runs on your device — no upload, ever. I want every student in IL-10 to see, in 30 seconds, that the face on their screen isn't real.
 
 ### 90-second demo intro
 
-> Hi, I'm Jotin, a freshman at Stevenson. The app I'm about to show you started with one observation: my cousin knew the calorie count of a salad, but had no idea what TikTok's filter button was doing to their jawline.
+> Hi, I'm Jotin, a sophomore at Stevenson. I started building a skincare tracking app. Then I realized two things — skincare apps already exist, and telling a teen what's wrong with their skin is dangerously close to medical advice. So I asked what the actual root problem was. It wasn't skincare. It was that filters had already replaced the real face as the reference image.
+>
+> I watched my cousin take the same photo fifteen times and put their phone face-down on the table without saying anything. That's when I knew what I actually needed to build.
 >
 > So I built Unfilter — a privacy-first web app that does three things social platforms won't.
 >
 > *(Cut to Distortion Lab.)* First, it shows you the trick. Upload a photo and watch the filter math apply on your device, in your browser, in real time.
 >
-> *(Cut to Check-in.)* Second, it lets you record what your real skin is actually doing — using real computer vision, no cloud, no upload. Watch the network tab. There's nothing there.
+> *(Cut to Filter Detector.)* Second, it shows you what was done to photos you're already comparing yourself to.
 >
-> *(Cut to Confidence cards.)* Third, it teaches the media literacy your health class skipped.
+> *(Cut to Check-in.)* Third, it lets you record what your real skin is actually doing — using real computer vision, no cloud, no upload. Watch the network tab. There's nothing there.
 >
-> The whole thing runs on-device. Nothing about your face touches a server. Let me show you a check-in.
+> The whole thing runs on-device. Nothing about your face touches a server. Let me show you the Distortion Lab.
 
 ---
 
