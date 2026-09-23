@@ -32,8 +32,6 @@ Unfilter is built so the privacy claim is **verifiable, not marketing.**
 - **No third-party analytics, no image hosting, no model API calls.** The computer vision runs in the browser via canvas image-data math.
 - **How to verify yourself:** open DevTools, switch to the Network tab, and run a check-in. You will see zero requests carrying image data. The only network traffic is the session cookie.
 
-If you don't trust the claim, don't trust it — open the tab and watch.
-
 ## Tech stack
 
 - Next.js 16 (App Router) · React 19 · TypeScript
