@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 import { useAuthStore } from "@/features/auth/store";
 
 interface TopHeaderProps {
@@ -42,17 +43,7 @@ export function TopHeader({ sidebarOpen, onToggle }: TopHeaderProps) {
         </button>
 
         <Link href="/" className="flex items-center gap-2 ml-1.5">
-          <div className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-[var(--accent)]">
-            <span
-              className="text-white text-[11px] font-bold leading-none"
-              style={{ fontFamily: "Fraunces, serif" }}
-            >
-              U
-            </span>
-          </div>
-          <span className="text-display text-[15px] text-[var(--text-primary)]">
-            Unfilter
-          </span>
+          <Logo size={26} />
         </Link>
       </div>
 

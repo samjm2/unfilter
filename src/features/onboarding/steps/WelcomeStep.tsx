@@ -6,6 +6,7 @@ import {
   TrustChip,
   CalloutPanel,
 } from "@/components/ui";
+import { Logo } from "@/components/Logo";
 
 interface WelcomeStepProps {
   onContinue: () => void;
@@ -16,17 +17,7 @@ export function WelcomeStep({ onContinue }: WelcomeStepProps) {
     <div className="min-h-[100dvh] flex flex-col justify-between px-6 py-8 md:px-12 md:py-12">
       {/* Top bar */}
       <div className="flex items-center gap-2.5 animate-fade-in">
-        <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[var(--accent-dark)] shadow-sm">
-          <span className="text-white text-[15px] font-bold" style={{ fontFamily: "Outfit" }}>
-            U
-          </span>
-        </div>
-        <span
-          className="text-[17px] font-semibold text-[var(--text-primary)] tracking-[-0.02em]"
-          style={{ fontFamily: "Outfit" }}
-        >
-          Unfilter
-        </span>
+        <Logo size={36} />
       </div>
 
       {/* Main content — asymmetric on desktop */}

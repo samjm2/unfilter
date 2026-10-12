@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { Logo } from "@/components/Logo";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/features/auth/store";
 
@@ -44,13 +45,8 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--bg-primary)]">
         <div className="text-center animate-fade-up">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[14px] bg-[var(--accent)] mx-auto mb-4">
-            <span
-              className="text-white text-[18px] font-bold"
-              style={{ fontFamily: "Fraunces" }}
-            >
-              U
-            </span>
+          <div className="mb-4">
+            <Logo size={48} wordmark={false} />
           </div>
           <p className="text-[14px] text-[var(--text-tertiary)]">Loading…</p>
         </div>

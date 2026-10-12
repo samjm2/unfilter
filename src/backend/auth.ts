@@ -135,7 +135,7 @@ export async function sendVerificationEmail(
       html: `
         <div style="font-family: 'Helvetica Neue', sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px;">
           <div style="text-align: center; margin-bottom: 32px;">
-            <div style="display: inline-block; background: #4a7c59; color: white; font-weight: bold; font-size: 18px; width: 44px; height: 44px; line-height: 44px; border-radius: 12px;">U</div>
+            <img src="${APP_URL}/logo.png" alt="Unfilter" width="60" height="44" style="display: inline-block;" />
           </div>
           <h1 style="font-size: 22px; font-weight: 700; color: #2d2620; margin: 0 0 8px;">Welcome to Unfilter, ${escapeHtml(username)}</h1>
           <p style="font-size: 15px; color: #6b5e50; line-height: 1.6; margin: 0 0 28px;">
@@ -184,7 +184,7 @@ export async function sendPasswordResetEmail(
       html: `
         <div style="font-family: 'Helvetica Neue', sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px;">
           <div style="text-align: center; margin-bottom: 32px;">
-            <div style="display: inline-block; background: #4a7c59; color: white; font-weight: bold; font-size: 18px; width: 44px; height: 44px; line-height: 44px; border-radius: 12px;">U</div>
+            <img src="${APP_URL}/logo.png" alt="Unfilter" width="60" height="44" style="display: inline-block;" />
           </div>
           <h1 style="font-size: 22px; font-weight: 700; color: #2d2620; margin: 0 0 8px;">Reset your password, ${escapeHtml(username)}</h1>
           <p style="font-size: 15px; color: #6b5e50; line-height: 1.6; margin: 0 0 28px;">
