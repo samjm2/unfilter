@@ -1,6 +1,7 @@
 // Privacy Policy — Unfilter
 
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 export const metadata = {
   title: "Privacy — Unfilter",
@@ -13,10 +14,7 @@ export default function PrivacyPage() {
       <nav className="sticky top-0 z-50 border-b border-[var(--border-light)] bg-[color:color-mix(in_srgb,var(--bg-primary)_88%,transparent)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
           <Link href="/landing" className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[var(--accent)]">
-              <span className="text-[13px] font-bold text-white" style={{ fontFamily: "Fraunces, serif" }}>U</span>
-            </div>
-            <span className="text-display text-[18px] text-[var(--text-primary)]">Unfilter</span>
+            <Logo size={32} />
           </Link>
           <Link href="/landing" className="text-[13px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             ← Back

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Logo } from "@/components/Logo";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/features/auth/store";
@@ -129,10 +130,7 @@ export default function SignupPage() {
 
         <div>
           <div className="flex items-center gap-3 mb-16">
-            <div className="flex h-11 w-11 items-center justify-center rounded-[13px] bg-[var(--accent)] shadow-lg shadow-[var(--accent)]/20">
-              <span className="text-white text-[17px] font-bold" style={{ fontFamily: "Fraunces" }}>U</span>
-            </div>
-            <span className="text-display text-[22px] text-[var(--text-primary)]">Unfilter</span>
+            <Logo size={44} />
           </div>
 
           <h1 className="text-display text-[clamp(28px,3.5vw,40px)] text-[var(--text-primary)] mb-4 max-w-md">
@@ -168,10 +166,7 @@ export default function SignupPage() {
         <div className="w-full max-w-[400px]">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--accent)]">
-              <span className="text-white text-[16px] font-bold" style={{ fontFamily: "Fraunces" }}>U</span>
-            </div>
-            <span className="text-display text-[20px] text-[var(--text-primary)]">Unfilter</span>
+            <Logo size={40} />
           </div>
 
           <div className="animate-fade-up">

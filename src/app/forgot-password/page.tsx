@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { IconShield } from "@/components/icons";
 import { applyPreferencesToDocument, getDefaultPreferences } from "@/features/settings/preferences";
@@ -49,10 +50,7 @@ export default function ForgotPasswordPage() {
 
         <div>
           <div className="flex items-center gap-3 mb-16">
-            <div className="flex h-11 w-11 items-center justify-center rounded-[13px] bg-[var(--accent)] shadow-lg shadow-[var(--accent)]/20">
-              <span className="text-white text-[17px] font-bold" style={{ fontFamily: "Fraunces" }}>U</span>
-            </div>
-            <span className="text-display text-[22px] text-[var(--text-primary)]">Unfilter</span>
+            <Logo size={44} />
           </div>
 
           <h1 className="text-display text-[clamp(32px,4vw,44px)] text-[var(--text-primary)] mb-4 max-w-md">
@@ -75,10 +73,7 @@ export default function ForgotPasswordPage() {
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-[var(--bg-primary)]">
         <div className="w-full max-w-[400px]">
           <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-[var(--accent)]">
-              <span className="text-white text-[16px] font-bold" style={{ fontFamily: "Fraunces" }}>U</span>
-            </div>
-            <span className="text-display text-[20px] text-[var(--text-primary)]">Unfilter</span>
+            <Logo size={40} />
           </div>
 
           {submitted ? (

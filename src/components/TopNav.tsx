@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -48,10 +49,7 @@ export function TopNav() {
     <header className="sticky top-0 z-50 border-b border-[var(--border-light)] bg-[var(--bg-elevated)]/85 backdrop-blur-xl">
       <div className="flex items-center justify-between px-5 py-3.5">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[var(--accent)]">
-            <span className="text-white text-[13px] font-bold" style={{ fontFamily: "Fraunces" }}>U</span>
-          </div>
-          <span className="text-display text-[18px] text-[var(--text-primary)]">Unfilter</span>
+          <Logo size={32} />
         </Link>
         <button
           onClick={() => setOpen(!open)}

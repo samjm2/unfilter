@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconShield, IconCheck } from "@/components/icons";
@@ -177,10 +178,7 @@ export default function ResetPasswordPage() {
 
         <div>
           <div className="flex items-center gap-3 mb-16">
-            <div className="flex h-11 w-11 items-center justify-center rounded-[13px] bg-[var(--accent)] shadow-lg shadow-[var(--accent)]/20">
-              <span className="text-white text-[17px] font-bold" style={{ fontFamily: "Fraunces" }}>U</span>
-            </div>
-            <span className="text-display text-[22px] text-[var(--text-primary)]">Unfilter</span>
+            <Logo size={44} />
           </div>
 
           <h1 className="text-display text-[clamp(32px,4vw,44px)] text-[var(--text-primary)] mb-4 max-w-md">

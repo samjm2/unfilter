@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Logo } from "@/components/Logo";
 import { useRouter } from "next/navigation";
 import type { OnboardingStep, Goal, TimeBudget } from "./types";
 import { useOnboardingStore } from "./store";
@@ -48,9 +49,7 @@ export default function OnboardingFlow() {
         <div className="sticky top-0 z-50 bg-[var(--bg-primary)]/80 backdrop-blur-md border-b border-[var(--border)]/60">
           <div className="max-w-lg mx-auto px-6 py-3 flex items-center gap-3">
             {/* Logo */}
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent-dark)] shrink-0">
-              <span className="text-white text-[11px] font-bold" style={{ fontFamily: "Outfit" }}>U</span>
-            </div>
+            <Logo size={28} wordmark={false} />
 
             {/* Step bar */}
             <div className="flex-1 flex gap-1.5">

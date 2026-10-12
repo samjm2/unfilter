@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 
 // ============================================================
@@ -190,17 +191,7 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 border-b border-[var(--border-light)] bg-[color:color-mix(in_srgb,var(--bg-primary)_88%,transparent)] backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[var(--accent)]">
-              <span
-                className="text-[13px] font-bold text-white"
-                style={{ fontFamily: "Fraunces, serif" }}
-              >
-                U
-              </span>
-            </div>
-            <span className="text-display text-[18px] text-[var(--text-primary)]">
-              Unfilter
-            </span>
+            <Logo size={32} />
           </div>
 
           <div className="flex items-center gap-2">
