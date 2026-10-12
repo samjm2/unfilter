@@ -97,7 +97,7 @@ export function detectFilters(img: HTMLImageElement): DetectionResult {
   }
 
   // ---- Signal 3: Color Grading ----
-  const colorResult = detectColorGrading(data, skinPixels, totalPixels);
+  const colorResult = detectColorGrading(data, skinPixels);
   if (colorResult.confidence > 0.25) {
     signals.push(colorResult);
   }
@@ -279,7 +279,6 @@ function detectBlemishRemoval(
 function detectColorGrading(
   data: Uint8ClampedArray,
   skinPixels: number[],
-  totalPixels: number,
 ): FilterSignal {
   // Instagram-style color grading shifts the overall color balance:
   // - Warm filters boost red/yellow, reduce blue
@@ -290,12 +289,13 @@ function detectColorGrading(
   let sumR = 0, sumG = 0, sumB = 0;
   let sumSat = 0;
 
-  // Sample from full image, not just skin
-  const sampleStep = Math.max(1, Math.floor(totalPixels / 10000));
+  // Sample skin pixels only — warm backgrounds (wood, sunsets, beige walls)
+  // were flagging unfiltered selfies as graded.
+  const sampleStep = Math.max(1, Math.floor(skinPixels.length / 10000));
   let sampleCount = 0;
 
-  for (let i = 0; i < totalPixels; i += sampleStep) {
-    const p = i * 4;
+  for (let s = 0; s < skinPixels.length; s += sampleStep) {
+    const p = skinPixels[s] * 4;
     const r = data[p], g = data[p + 1], b = data[p + 2];
     sumR += r;
     sumG += g;
@@ -312,12 +312,12 @@ function detectColorGrading(
   const avgB = sumB / sampleCount;
   const avgSat = sumSat / sampleCount;
 
-  // Warm grading: R/B ratio significantly above neutral (~1.0-1.15 is normal)
+  // Skin is naturally warm: unfiltered R/B runs ~1.3-2.2 across skin tones
   const warmthRatio = avgB > 0 ? avgR / avgB : 1;
-  const warmthShift = Math.max(0, warmthRatio - 1.15);
+  const warmthShift = Math.max(0, warmthRatio - 2.2);
 
-  // Saturation boost: natural photos average ~0.15-0.30, boosted >0.35
-  const satBoost = Math.max(0, avgSat - 0.30);
+  // Skin saturation: natural ~0.25-0.55 across skin tones, boosted >0.55
+  const satBoost = Math.max(0, avgSat - 0.55);
 
   // Combine warmth and saturation signals
   const rawConfidence = warmthShift * 2 + satBoost * 3;
@@ -331,7 +331,7 @@ function detectColorGrading(
       : confidence > 0.25
       ? "Some color adjustment detected — slight warmth or saturation shift from natural."
       : "Colors appear mostly natural. No significant grading detected.",
-    technical: `R/G/B means: ${avgR.toFixed(0)}/${avgG.toFixed(0)}/${avgB.toFixed(0)}. Warmth ratio (R/B): ${warmthRatio.toFixed(2)} (neutral: 1.0-1.15). Avg saturation: ${avgSat.toFixed(3)} (natural: 0.15-0.30).`,
+    technical: `Skin R/G/B means: ${avgR.toFixed(0)}/${avgG.toFixed(0)}/${avgB.toFixed(0)}. Warmth ratio (R/B): ${warmthRatio.toFixed(2)} (natural skin: 1.3-2.2). Avg skin saturation: ${avgSat.toFixed(3)} (natural: 0.25-0.55).`,
   };
 }
 

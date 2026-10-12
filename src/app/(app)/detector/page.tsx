@@ -144,6 +144,8 @@ export default function DetectorPage() {
           <h1 className="text-display text-[clamp(22px,4vw,30px)] text-[var(--text-primary)] mb-6">
             {result.verdict === "clean"
               ? "This photo has nothing to hide."
+              : result.verdict === "subtle"
+              ? "This photo was lightly touched up."
               : "This photo had something to hide."}
           </h1>
 

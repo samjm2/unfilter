@@ -47,7 +47,7 @@ export interface SkinMetrics {
   uniformity: number; // 0-1
   reliability: number; // 0-1 — how trustworthy is this reading
   skinPixelRatio?: number; // fraction of image that was detected as skin
-  analysisMethod?: "cv-pixel" | "onnx" | "mock"; // what ran the analysis
+  analysisMethod?: "cv-pixel" | "mock"; // what ran the analysis
 }
 
 /** Full result from a check-in */

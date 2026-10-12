@@ -22,6 +22,8 @@ const PUBLIC_PATHS = [
   "/api/auth",
   "/api/oauth",
   "/landing",
+  "/privacy",
+  "/terms-of-service",
   "/onboarding",
 ];
 

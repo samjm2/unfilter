@@ -1,6 +1,6 @@
 # Unfilter — Narrative & Demo Playbook
 
-Everything you need to talk about, pitch, and demo Unfilter for the Congressional App Challenge (IL-10) and beyond. Keep this open while recording.
+Everything you need to talk about, pitch, and demo Unfilter for the Congressional App Challenge (IL-09) and beyond. Keep this open while recording.
 
 ---
 
@@ -39,7 +39,7 @@ Use this when someone asks "what is Unfilter?" in five seconds or less.
 Variants:
 - **For tech audiences:** "On-device computer vision in the browser — zero photo upload — that exposes what filters change and lets teens journal their real skin."
 - **For mental-health framing:** "A media literacy tool for the generation that grew up with the AI face."
-- **For policy / CAC framing:** "Free, open, browser-based, built in IL-10 to give teens a defense against algorithmic distortion of their own image."
+- **For policy / CAC framing:** "Free, open, browser-based, built in IL-09 to give teens a defense against algorithmic distortion of their own image."
 
 ---
 
@@ -57,7 +57,7 @@ Variants:
 >
 > I watched my cousin take the same photo fifteen times and put their phone face-down on the table without saying anything. That's why I built Unfilter.
 >
-> The Distortion Lab shows you pore by pore what a filter actually does to a face. The Filter Detector shows you what was done to photos you're already comparing yourself to. And it all runs on your device — no upload, ever. I want every student in IL-10 to see, in 30 seconds, that the face on their screen isn't real.
+> The Distortion Lab shows you pore by pore what a filter actually does to a face. The Filter Detector shows you what was done to photos you're already comparing yourself to. And it all runs on your device — no upload, ever. I want every student in IL-09 to see, in 30 seconds, that the face on their screen isn't real.
 
 ### 90-second demo intro
 
@@ -131,9 +131,9 @@ Record in this order (each in isolation, edit together later):
 
 ### Closing lines (pick one)
 
-> My cousin didn't know. A board-certified dermatologist told me more teens don't know every year. Unfilter shows them. From IL-10.
+> My cousin didn't know. A board-certified dermatologist told me more teens don't know every year. Unfilter shows them. From IL-09.
 
-> The first generation that grew up with AI faces deserves the first generation of tools that show them the truth. That's Unfilter. From IL-10.
+> The first generation that grew up with AI faces deserves the first generation of tools that show them the truth. That's Unfilter. From IL-09.
 
 > Built in Illinois, for every kid who thought that was just what they looked like.
 
@@ -219,11 +219,11 @@ All three quotes were collected directly. Sources preferred to remain anonymous 
 
 ### "How does this scale?"
 
-> The whole thing is a static web app + a tiny auth service. Adding a million users adds storage cost for a million email/password rows. The expensive part — the image analysis — runs on the user's device. The architecture is what makes this *possible* for one freshman to build and maintain.
+> The whole thing is a static web app + a tiny auth service. Adding a million users adds storage cost for a million email/password rows. The expensive part — the image analysis — runs on the user's device. The architecture is what makes this *possible* for one sophomore to build and maintain.
 
 ### "What's next?"
 
-> A native iOS wrapper for App Store distribution (Capacitor shell already scaffolded), a school-friendly version with curriculum tie-ins to health class, and a "trusted adult" mode that lets a counselor or parent see only aggregate trends with the teen's explicit permission.
+> A native iOS wrapper for App Store distribution, a school-friendly version with curriculum tie-ins to health class, and a "trusted adult" mode that lets a counselor or parent see only aggregate trends with the teen's explicit permission.
 
 ---
 
@@ -255,4 +255,4 @@ One image. One line. One story. That's how a project becomes memorable in a stac
 
 If you forget everything else, remember this: **judges remember the kid, not the code.** The code being real and well-built is what makes the kid credible — but it's the kid and the story that wins.
 
-The story is: a freshman in IL-10 watched his cousin's real life get smaller because of fake faces, and built something free and private to fight it. Lead with that. Always.
+The story is: a sophomore in IL-09 watched his cousin's real life get smaller because of fake faces, and built something free and private to fight it. Lead with that. Always.

@@ -621,8 +621,8 @@ export default function LandingPage() {
               Start seeing.
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-[15px] leading-[1.8] text-[var(--text-secondary)]">
-              Unfilter is free, private, and built by a freshman at Stevenson HS in
-              IL-10 who got tired of watching filtered skin become everyone&apos;s standard.
+              Unfilter is free, private, and built by a sophomore at Stevenson HS in
+              IL-09 who got tired of watching filtered skin become everyone&apos;s standard.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
@@ -687,7 +687,7 @@ export default function LandingPage() {
       {/* ---- FOOTER ---- */}
       <footer className="border-t border-[var(--border-light)] px-6 py-6">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 text-[11px] text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
-          <p>Unfilter · Privacy-first filter literacy for teens · Built in IL-10</p>
+          <p>Unfilter · Privacy-first filter literacy for teens · Built in IL-09</p>
           <div className="flex items-center gap-4">
             <p>Educational guidance only · Not medical advice</p>
             <Link href="/privacy" className="hover:text-[var(--accent)] transition">Privacy</Link>

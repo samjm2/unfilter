@@ -61,6 +61,16 @@ export default function HelpPage() {
             </CalloutPanel>
           </div>
 
+          {/* Crisis lines */}
+          <div className="mb-6 animate-fade-up stagger-2">
+            <CalloutPanel icon={<IconHeart size={18} />} variant="sage">
+              <strong>If how you feel about your body or appearance is getting heavy</strong>, you can
+              talk to someone right now, free and confidential, 24/7:{" "}
+              <a href="tel:988" className="font-semibold underline">call or text 988</a> (Suicide &amp; Crisis Lifeline), or{" "}
+              <a href="sms:741741&body=HOME" className="font-semibold underline">text HOME to 741741</a> (Crisis Text Line).
+            </CalloutPanel>
+          </div>
+
           <div className="space-y-3">
             {/* ============ RED FLAGS ============ */}
             <AccordionSection

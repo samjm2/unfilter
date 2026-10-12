@@ -56,7 +56,7 @@ const PRESETS: PresetInfo[] = [
     label: "Snapchat Style",
     platform: "Snapchat",
     state: { skinTexture: 55, faceShape: 40, lightingTone: 20, makeup: 15 },
-    description: "Snapchat's default camera applies skin smoothing and subtle face reshaping before you even pick a filter. Pimples, pores, and acne are blurred away automatically. Their \"Lens\" system uses AR to slim your jaw and enlarge your eyes in real time.",
+    description: "Snapchat's camera can smooth skin and subtly reshape faces through built-in settings, before you pick a filter. Pimples, pores, and acne get blurred away. Their \"Lens\" system uses AR to slim your jaw and enlarge your eyes in real time.",
   },
   {
     id: "instagram",
@@ -97,7 +97,7 @@ const EDUCATION: Record<CategoryKey, { title: string; changed: string; matters: 
     title: "Skin Texture",
     changed: "Erases pimples, acne, pores, fine lines, and scars. Removes under-eye bags and dark circles. Makes skin look like plastic.",
     matters: "Real skin has pores and texture. When every photo is smoothed, you start believing normal skin is flawed.",
-    whoDoesThis: "Snapchat and TikTok apply this automatically — before you even choose a filter. Facetune lets influencers erase individual pimples. Instagram AR effects do it in real time on video calls.",
+    whoDoesThis: "Snapchat and TikTok ship built-in \"enhance\" and \"retouch\" settings that smooth skin before you pick a filter. Facetune lets influencers erase individual pimples. Instagram AR effects do it in real time on video calls.",
   },
   faceShape: {
     title: "Face Shape",
@@ -199,7 +199,7 @@ function getSliderMessage(key: CategoryKey, value: number): SliderMessage | null
 const GUIDED_OVERLAYS: Partial<Record<GuidedStep, { title: string; body: string; cta: string }>> = {
   reveal: {
     title: "This is what they're hiding from you.",
-    body: "We just applied the same techniques that Snapchat, TikTok, and Instagram use — often before you even choose a filter. Drag the divider to see truth vs illusion.",
+    body: "We just applied the same techniques that Snapchat, TikTok, and Instagram use — sometimes in default camera settings, before you pick a filter. Drag the divider to see truth vs illusion.",
     cta: "What did they change?",
   },
   "explain-1": {
