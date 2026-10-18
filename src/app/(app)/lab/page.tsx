@@ -438,10 +438,13 @@ export default function DistortionLabPage() {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
+      // Cap at 600px: the bilateral filter is O(pixels × radius²) on the main thread,
+      // so a full-res phone photo (12MP) froze the tab.
+      const scale = Math.min(1, 600 / Math.max(img.width, img.height));
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
       const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       originalCanvasRef.current = canvas;
     };
     img.src = dataUrl;
