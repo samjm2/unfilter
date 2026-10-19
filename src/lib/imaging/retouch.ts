@@ -256,8 +256,6 @@ export function detectBlemishes(
       }
     }
   }
-
-  // Pass 2: cluster flagged pixels into blemish regions (flood fill)
   const visited = new Uint8Array(width * height);
   const blemishes: BlemishRegion[] = [];
 
