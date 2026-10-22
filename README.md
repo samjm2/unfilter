@@ -99,14 +99,6 @@ You should see a fully populated journal, check-in history, and streak.
 | `/reality-check` | Daily filter education with streak tracking |
 | `/settings` | Privacy controls, theme, text size |
 
-## How AI was used in building this
-
-Unfilter was built with AI coding assistants (Claude Code) as a pair programmer. In the spirit of a filter-literacy app, here is the unfiltered version:
-
-- **Written by me:** the problem, the concept, every product decision (what the app does and refuses to do), the privacy architecture, the UI direction, the narrative and demo, and all testing on real photos and real devices.
-- **Written with AI help:** much of the implementation — React components, the canvas pixel-math in the Distortion Lab and Filter Detector, the auth routes, and the SQLite setup. I directed the work, reviewed every change, and reworked anything that didn't behave the way the product needed.
-- **Not used:** no AI models run in the app. The Filter Detector and check-in analysis are hand-tuned heuristics over raw pixel data, and nothing is sent to an AI API.
-
 ## Project structure
 
 ```
